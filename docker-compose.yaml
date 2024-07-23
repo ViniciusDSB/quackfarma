@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  db:
+    image: 'postgres:latest'
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_DB: megadb
+      POSTGRES_USER: megauser
+      POSTGRES_PASSWORD: 3240
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  server:
+    build: 
+      dockerfile: Dockerfile
+      context: ./mega_back
+    volumes: 
+      - ./mega_back:/megaprojeto/server
+      - /megaprojeto/server/node_modules
+    expose:
+      - 3000
+    ports:
+      - 3001:3000
+    environment:
+      - POSTGRES_URL=postgres://megauser:3240@db:5432/megadb
+    depends_on:
+      - db
+  front:
+    build: 
+      dockerfile: Dockerfile
+      context: ./mega_front
+    volumes:
+      - ./mega_front:/megaprojeto/front
+      - /megaprojeto/front/node_modules
+    expose:
+      - 8080
+    ports:
+      - 8081:8080
+    depends_on:
+      - server
+
+
+volumes:
+  postgres_data:

@@ -1,0 +1,5 @@
+docker_files
+mega_back/node_modules
+mega_front/node_modules
+notes.txt
+tmpDbStructure.txt
