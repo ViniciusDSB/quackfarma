@@ -6,7 +6,55 @@ const path = require('path');
 //database, pg pool (located at ./dbConnection.js)
 const dbPool = require('./dbConnection');
 
+const{ Login, User } = require("./myClasses");
 
+router.post('/fazerLogin', async (req, res) => {
+    const login = new Login(
+        req.body.email,
+        req.body.password
+    );
+    login.validateEmail();
+    login.validatePassword();
+
+    /*if(data is correct){
+        make a query to validate on database and redirect to the next page with logged
+    }else{
+        take err status from user and redirect with that err message
+    }
+    */
+
+    //prototype of validation
+    if(login.status == true){
+        res.send("Teste funcionou " + login.email);
+    }else{
+        res.send("Teste falhou, veja o log");
+    }
+
+})
+
+router.post("/criarUsuario", async (req, res) => {
+    const user = new User(
+        req.body.name,
+        req.body.cpf,
+        req.body.email,
+        req.body.password,
+        req.body.age,
+        req.body.phone
+    );
+    user.validateData();
+
+    /*if(data is correct){
+        make a query to save the user data on the database and redirect to the next page with user data
+    }else{
+        take err status from user and redirect with that err message
+    }
+    */
+    if(user.status == true){
+        res.send("Teste funcionou " + user.name + "!");
+    }else{
+        res.send("Teste falhou, veja o log");
+    }
+})
 
 //basic test routes
 router.get('/', async (req, res) => {
