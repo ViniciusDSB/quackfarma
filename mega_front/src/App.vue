@@ -8,7 +8,7 @@
           hide-details
           append-inner-icon="mdi-magnify"
       ></v-text-field>
-      <v-btn size="x-large" append-icon="mdi-account-circle">
+      <v-btn size="x-large" append-icon="mdi-account-circle" @click="$refs.login.open()">
         Log in
       </v-btn>
       <v-btn size="x-large">
@@ -19,10 +19,16 @@
       <v-tab v-for="item in categorias" :text="item.text" :value="item.value" :key="item"/>
     </v-tabs>
   </v-card>
+  <login  ref="login"/>
+
 </template>
 
 <script>
+import Login from "@/components/usuario/Login.vue";
 export default {
+  components :{
+    Login
+  },
   name: 'App',
   data() {
     return {
@@ -30,7 +36,8 @@ export default {
         {text: 'Medicamentos', value: 'medicamento'},
         {text: 'Higiene', value: 'higiene'},
         {text: 'Suplemento', value: 'suplemento'}
-      ]
+      ],
+      abrirLogin : false
     }
   }
 }
