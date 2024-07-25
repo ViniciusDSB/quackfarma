@@ -6,7 +6,6 @@ import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import * as mdiicon from '@mdi/font/css/materialdesignicons.css'
-
 import *  as fsicom from '@fortawesome/fontawesome-free/css/all.css'
 
 
