@@ -3,9 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test-Page</title>
+    <title>Tests-Page</title>
 </head>
 <body>
+
+    <form action="/criarUsuario" method="post">
+        <h1>Criar usuario</h1>
+        <input type="text" name="name" placeholder="Nome" required>
+        <input type="number" name="cpf" placeholder="Cpf" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Senha" required>
+        <input type="number" name="age" placeholder="Idade">
+        <input type="number" name="phone" placeholder="Telefone">
+        <button type="submit">Salvar</button>
+    </form><br>
+
+    <form action="/fazerLogin" method="post">
+        <h1>Fazer login</h1>
+        <input type="email" name="email" placeholder="email"><br>
+        <input type="password" name="password" placeholder="senha"><br>
+        <button type="submit">Loga</button>
+    </form>
+
     <form action="/insert" method="post">
         <h1>insert</h1><br>
         <input type="text" name="nome" placeholder="nome"><br>
