@@ -7,13 +7,27 @@
 </head>
 <body>
 
-    <form action="/criarUsuario" method="post">
+    <form action="sendQuery" method="post">
+        <textarea name="theQuery" placeholder="digite a query aqui"></textarea>
+        <button type="submit">Send</button>
+    </form>
+
+    <form action="/cadastrarAdm" method="post">
+        <h1>Criar ADM</h1>
+        <input type="text" name="name" placeholder="Nome" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Senha" required>
+        <button type="submit">Cadastar</button>
+    </form>
+
+    <form action="/cadastrarCli" method="post">
         <h1>Criar usuario</h1>
         <input type="text" name="name" placeholder="Nome" required>
         <input type="number" name="cpf" placeholder="Cpf" required>
         <input type="email" name="email" placeholder="Email" required>
         <input type="password" name="password" placeholder="Senha" required>
-        <input type="number" name="age" placeholder="Idade">
+        <input type="number" name="rg" placeholder="Rg">
+        <input type="text" name="address" placeholder="Endereco">
         <input type="number" name="phone" placeholder="Telefone">
         <button type="submit">Salvar</button>
     </form><br>

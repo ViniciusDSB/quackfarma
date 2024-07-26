@@ -1,104 +1,123 @@
+const defaultStatus = "OK";
+
 class Login{
     constructor(loginEmail, loginPassword){
         this.email = loginEmail;
         this.password = loginPassword;
     }
+
     validateEmail(){
-        if(true){
-            this.status = true;
-        }else{
-            this.status = false;
+        if(false){
+            this.status = "Email inválido";
         }
     }
     validatePassword(){
-        if(true){
-            this.status =true;
-        }else{
-            this.status = false;
+        if(false){
+            this.status = "Senha inválida";
         }
+    }
+
+    //The validateFunctions() will check the format, size etc of the received data
+    //if everything is fine the status remains OK, else, if anyhing ir wrong an error status is set
+    validateData(){
+        this.status = defaultStats;
+
+        this.validadeEmail();
+        this.validatePassword();
     }
 }
 
-/*
-nome varchar(255) [not null]
-    cpf varchar(11) [not null]
-    email varchar(255) [not null]
-    senha varchar(256) [not null] //6 a 10 caracteres, mas aqui no banco fica so a hash
-    idade integer //idade maxima/quantidade maxima de caracteres na idade
-    telefone integer //11 caracteres, formato (DDD)9-1234-5678
-     */
-
 class User{
-    constructor(name, cpf, email, password, age, phone){
+    constructor(name, email, password){
         this.name = name;
-        this.cpf = cpf;
         this.email = email;
-        this.password = password;
-        this.age = age;
+        this.pasword = password;
+    }
+    validateName(){
+        if(false){
+            this.status = "Nome inválido";
+        }
+    }
+    validateEmail(){
+        if(false){
+            this.status = "Email inválido";
+        }
+    }
+    validatePassword(){
+        if(false){
+            this.status = "Senha inválido";
+        }
+    }
+
+    validateData(){
+        this.status = defaultStatus;
+
+        this.validateName();
+        this.validateEmail();
+        this.validatePassword();
+    }
+}
+
+
+class UserManager extends User{
+    constructor(name, email, password){
+        super(name, email, password);
+    }
+}
+class UserClient extends User{
+    constructor(name, cpf, email, password, rg, address, phone){
+        super(name, email, password);
+        this.cpf = cpf;
+        this.rg = rg;
+        this.address = address;
         this.phone = phone;
     }
 
-    //prototypes only; the validateFunctions() will check the formar, size etc of the received data
-    //if they are correct it will set a OK status that allows the rote to proced, 
-    //saving data in the database and redirectign the user
-    //if data is not correct it sets an error status
-
-    validateData(){
-        this.validateName();
-        this.validateCpf();
-        this.validateEmail();
-        this.validatePassword();
-        this.validateAge();
-        this.validatePhone();
-
-        if(true){
-            this.status = true;
-        }else{
-            this.status = false;
-        }
-    }
-    validateName(){
-        if(true){
-            return true;
-        }else{
-            return false;
-        }
-    }
     validateCpf(){
-        if(true){
-            return true;
-        }else{
-            return false;
+        let stats = true;
+        //swtch case is better
+        if(this.cpf == ""){
+            stats = false;
+        }
+        if(!stats){
+            this.status = "CPF inválido";
         }
     }
-    validateEmail(){
-        if(true){
-            return true;
-        }else{
-            return false;
-        }
-    }
-    validatePassword(){
-        if(true){
-            return true;
-        }else{
-            return false;
-        }
-    }
-    validateAge(){
-        if(true){
-            return true;
-        }else{
-            return false;
+    validateRg(){
+        if(false){
+            this.status = "Rg inválido";
         }
     }
     validatePhone(){
-        if(true){
-            return true;
-        }else{
-            return false;
+        if(false){
+            this.status = "Numero de telefone inválido";
         }
     }
+    validateAddress(){
+        let validationStatus = true;
+        
+        if(this.address == ""){
+            this.address = null;
+        }
+
+        if(!validationStatus){
+            this.status = "Endereço inválido";
+        }
+    }
+
+    validateData(){
+        this.status = defaultStatus;
+
+        this.validateName();
+        this.validateEmail();
+        this.validatePassword();
+        this.validateCpf();
+        this.validateRg();
+        this.validateAddress();
+        this.validatePhone();
+    }
+    
 }
 
-module.exports = { Login, User}
+
+module.exports = { Login, User, UserManager, UserClient, defaultStats};
