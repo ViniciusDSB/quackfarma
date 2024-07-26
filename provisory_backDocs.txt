@@ -1,0 +1,35 @@
+rotas existentes e seus campos{
+    /fazerLogin: email, password
+    /cadastrarAdm: name, email, password, passwordRepeat
+    /cadastrarCli: name, cpf, email, password, passwordRepeat, rg, address, phone
+}
+
+Para todas as rotas há o status, "OK" se tudo estiver correto, caso contrario status é uma mensagem indicando o erro
+Se tiver a palavra "inválido" na mensagem isso indica um erro de formatação, como qtd inválida de caracteres
+Se a palavra for "incorreto" então significa que não esta de acordo com os dados do bando, senha errada por exemplo;
+Assim, caso status seja OK basta prosseguir, salvando cookies, redioreconando etc
+Caso contrario, basta exibir a mensagem que está no status, ela indicará o problema.
+
+Caso queria realizar testes, vá para a localhost:3001
+La tem formularios se comunicando com o o servidor, 
+um campo para lancar queries diretamente ao banco,
+um formulario de CRUD para uma tabela 'testes',
+um form de login
+form para cadastar cliente e um para adm
+
+
+/fazerLogin: recebe um campo de nome email e um de nome passowrd, faz as validações e retorna um json da forma:
+    loginRes = { email: "", name: "", status: "OK/outros", exists: true/false }
+    Caso tudo esteja correto o loginRes.status será "OK" e terá o email fornecido e o nome do usuario
+    Se algum problema ocorrer então loginRes.status != "OK", isto é, status será uma mensagem indicando o erro
+
+/cadastrarCli, recebe os campos: name, cpf, email, password, passwordRepeat, rg, address, phone;
+    newClientRes = { email: "", name: "", status: "OK/outros", exists: true/false }
+    Como na rota anterior: se tudo tiver dado certo retorna status = "OK" e caso contrario
+    status = "mensagem de erro"
+
+/cadastrarAdm, recebe os campos: name,email, password, passwordRepeat; (não da pra fazer login com ADM agora, só cadastar)
+    newManagerRes = { email: "", name: "", status: "OK/outros", exists: true/false }
+    Mesmo esquema das rotas anteriores: se tudo tiver dado certo retorna status = "OK", caso contrario
+    status = "mensagem de erro"
+

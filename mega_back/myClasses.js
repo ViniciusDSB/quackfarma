@@ -1,4 +1,4 @@
-const defaultStatus = "OK";
+const DEFAULT_STATUS = "OK";
 
 class Login{
     constructor(loginEmail, loginPassword){
@@ -7,12 +7,15 @@ class Login{
     }
 
     validateEmail(){
-        if(false){
+        const TestEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if(!TestEmail.test(this.email)){
             this.status = "Email inválido";
         }
     }
     validatePassword(){
-        if(false){
+        const TestPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,10}$/;
+        if(!TestPassword.test(this.password)){
             this.status = "Senha inválida";
         }
     }
@@ -20,7 +23,7 @@ class Login{
     //The validateFunctions() will check the format, size etc of the received data
     //if everything is fine the status remains OK, else, if anyhing ir wrong an error status is set
     validateData(){
-        this.status = defaultStatus;
+        this.status = DEFAULT_STATUS;
 
         this.validateEmail();
         this.validatePassword();
@@ -28,10 +31,11 @@ class Login{
 }
 
 class User{
-    constructor(name, email, password){
+    constructor(name, email, password, passwordRepeat){
         this.name = name;
         this.email = email;
         this.password = password;
+        this.passwordRepeat = passwordRepeat
     }
     validateName(){
         const TestName = /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/;
@@ -55,13 +59,20 @@ class User{
     }
     validatePassword(){
         const TestPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,10}$/;
-        if(!TestPassword.test(this.password)){
-            this.status = "Senha inválido";
+        switch(true){
+            case !TestPassword.test(this.password):
+                this.status = "Senha inválida";
+                break;
+            case this.password != this.passwordRepeat:
+                this.status = "As senhas não são iguais!";
+                break;
+            default:
+                break;
         }
     }
 
     validateData(){
-        this.status = defaultStatus;
+        this.status = DEFAULT_STATUS;
 
         this.validateName();
         this.validateEmail();
@@ -71,13 +82,13 @@ class User{
 
 
 class UserManager extends User{
-    constructor(name, email, password){
-        super(name, email, password);
+    constructor(name, email, password, passwordRepeat){
+        super(name, email, password, passwordRepeat);
     }
 }
 class UserClient extends User{
-    constructor(name, cpf, email, password, rg, address, phone){
-        super(name, email, password);
+    constructor(name, cpf, email, password, passwordRepeat, rg, address, phone){
+        super(name, email, password, passwordRepeat);
         this.cpf = cpf;
         this.rg = rg;
         this.phone = phone;
@@ -87,10 +98,10 @@ class UserClient extends User{
     validateCpf(){
         switch(true){
             case this.cpf == "":
-                this.status = "CPF vazio!";
+                this.status = "CPF n'ao pode ser vazio!";
                 break;
             case !/^\d{11}$/.test(this.cpf): //Verifica se há 11 dígitos
-                this.status = "CPF inválido!";
+                this.status = "CPF inválido; Deve conter apenas 11 digitos!";
                 break;
             case VerificadorCpf(this.cpf) == false:
                 this.status = "CPF inválido!";
@@ -105,11 +116,11 @@ class UserClient extends User{
 
     validateRg(){
         switch(true){
-            case this.cpf == "":
-                this.address = null;
+            case this.rg == "":
+                this.rg = null;
                 break;
             case !/^[A-Z]{0,2}[0-9]{7,9}$/.test(this.rg):
-                this.status = "RG possui 7 à 9 caracteres!";
+                this.status = "RG deve possuir de 7 à 9 caracteres!";
                 break;
             default:
                 break;
@@ -144,7 +155,7 @@ class UserClient extends User{
     }
 
     validateData(){
-        this.status = defaultStatus;
+        this.status = DEFAULT_STATUS;
 
         this.validateName();
         this.validateEmail();
@@ -179,4 +190,4 @@ function VerificadorCpf(cpf) {
     return true;
 }
 
-module.exports = { Login, User, UserManager, UserClient, defaultStatus};
+module.exports = { Login, User, UserManager, UserClient, DEFAULT_STATUS};

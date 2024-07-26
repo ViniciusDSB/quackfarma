@@ -4,64 +4,113 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tests-Page</title>
+
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            border: none;
+            box-sizing: border-box;
+        }
+        body{
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            background: #000;
+            font-family: monospace;
+            color: green;
+        }
+        div{
+            width: 33.3%;
+            height: 100%;
+            border-left:1px solid white;
+            border-right:1px solid white;
+        }
+        form{
+            margin-bottom: 4%;
+            border-bottom: 1px solid white;
+        }
+        input{
+            background: black;
+            color: green;
+            border: 1px solid white;
+        }
+        button{
+            background: none;
+            color: white;
+            border: 1px solid green;
+        }
+    </style>
+
 </head>
 <body>
 
-    <form action="sendQuery" method="post">
-        <textarea name="theQuery" placeholder="digite a query aqui"></textarea>
-        <button type="submit">Send</button>
-    </form>
-
-    <form action="/cadastrarAdm" method="post">
-        <h1>Criar ADM</h1>
-        <input type="text" name="name" placeholder="Nome" required>
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Senha" required>
-        <button type="submit">Cadastar</button>
-    </form>
-
-    <form action="/cadastrarCli" method="post">
-        <h1>Criar usuario</h1>
-        <input type="text" name="name" placeholder="Nome" required>
-        <input type="number" name="cpf" placeholder="Cpf" required>
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Senha" required>
-        <input type="number" name="rg" placeholder="Rg">
-        <input type="text" name="address" placeholder="Endereco">
-        <input type="number" name="phone" placeholder="Telefone">
-        <button type="submit">Salvar</button>
-    </form><br>
-
-    <form action="/fazerLogin" method="post">
-        <h1>Fazer login</h1>
-        <input type="email" name="email" placeholder="email"><br>
-        <input type="password" name="password" placeholder="senha"><br>
-        <button type="submit">Loga</button>
-    </form>
-
-    <form action="/insert" method="post">
-        <h1>insert</h1><br>
-        <input type="text" name="nome" placeholder="nome"><br>
-        <input type="number" name="idade" placeholder="idade"><br>
-        <button type="submit">Salvar</button>
-    </form><br>
-
-    <form action="/select" method="get">
-        <h1>select</h1><br>
-        <button type="submit">Mostrar salvos</button>
-    </form><br>
-
-    <form action="/update" method="post">
-        <h1>update</h1>
-        <input type="text" name="nome" placeholder="Nome"><br>
-        <input type="text" name="novoNome" placeholder="Novo nome"><br>
-        <input type="number" name="idade" placeholder="idade"><br>
-        <button type="submit">Atualizar</button>
-    </form><br>
     
-    <form action="/delete" method="post">
-        <input type="text" name="nome" placeholder="Nome para deletar"><br>
-        <button type="submit">Deletar</button>
-    </form>
+    <div id="left">
+        <h1>PAGINA DOS DEUSES</h1>
+        <form action="/sendQuery" method="post">
+            <textarea name="theQuery" placeholder="digite queries de SQL; mas tome cuidado, isso aqui vai direto sem validar nada :)"></textarea>
+            <button type="submit">Send</button>
+        </form>
+    
+        <form action="/cadastrarAdm" method="post">
+            <h2>Criar ADM</h2>
+            <input type="text" name="name" placeholder="Nome" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Senha" required>
+            <input type="password" name="passwordRepeat" placeholder="Repita a senha" required>
+            <button type="submit">Cadastar</button>
+        </form>
+    
+        <form action="/cadastrarCli" method="post">
+            <h2>Criar usuario</h2>
+            <input type="text" name="name" placeholder="Nome" required>
+            <input type="number" name="cpf" placeholder="Cpf" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Senha" required>
+            <input type="password" name="passwordRepeat" placeholder="Repita a enha" required>
+            <input type="number" name="rg" placeholder="Rg">
+            <input type="text" name="address" placeholder="Endereco">
+            <input type="number" name="phone" placeholder="Telefone">
+            <button type="submit">Salvar</button>
+        </form><br>
+    </div>
+
+    <div id="middle">
+        <form action="/fazerLogin" method="post">
+            <h2>Fazer login</h2>
+            <input type="email" name="email" placeholder="email"><br>
+            <input type="password" name="password" placeholder="senha"><br>
+            <button type="submit">Logar</button>
+        </form>
+    </div>
+
+    <div id="right">
+        <h2>Apenas na tabela testes</h2>
+        <form action="/insert" method="post">
+            <h2>insert</h2><br>
+            <input type="text" name="nome" placeholder="nome"><br>
+            <input type="number" name="idade" placeholder="idade"><br>
+            <button type="submit">Salvar</button>
+        </form><br>
+    
+        <form action="/select" method="get">
+            <h2>select</h2><br>
+            <button type="submit">Mostrar salvos</button>
+        </form><br>
+    
+        <form action="/update" method="post">
+            <h2>update</h2>
+            <input type="text" name="nome" placeholder="Nome"><br>
+            <input type="text" name="novoNome" placeholder="Novo nome"><br>
+            <input type="number" name="idade" placeholder="idade"><br>
+            <button type="submit">Atualizar</button>
+        </form><br>
+        
+        <form action="/delete" method="post">
+            <input type="text" name="nome" placeholder="Nome para deletar"><br>
+            <button type="submit">Deletar</button>
+        </form>
+    </div>
 </body>
 </html>
