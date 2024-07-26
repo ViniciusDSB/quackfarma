@@ -76,12 +76,12 @@ router.post("/cadastrarCli", async (req, res) => {
         user.validateData();
     
         if(user.status != defaultStatus){
-            res.send("Teste falhou, veja o log");
+            res.send("Teste falhou, veja o log " + user.status + " veja!");
         }else{
-            res.send("Teste funcionou " + user.address + "!");
+            res.send("Teste funcionou " + user.name + "!");
         }
     }catch(err){
-        console.error('Erro na rota /cadastrarCli', err.message);
+        console.error('Erro na rota /cadastrarCli', err);
         res.status(500).send('Erro ao cadastrar cliente. Veirfique o log.');
     }
     
