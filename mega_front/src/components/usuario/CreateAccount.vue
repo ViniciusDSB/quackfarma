@@ -1,47 +1,62 @@
 <template>
-  <v-dialog v-model="dialog" max-width="600" color="light-green-lighten-4">
+  <v-dialog v-model="dialog" max-width="600" color="light-green-lighten-4" persistent>
     <v-card>
       <v-card-title>
         <v-btn
             icon="mdi-close-circle-outline"
             variant="text"
-            @click="dialog = false"
+            @click="close()"
         ></v-btn>
         <div class="font-weight-medium text-h3 d-flex justify-center">Criar Conta</div>
       </v-card-title>
       <v-card-text>
         <v-form ref="form">
           <div v-show="firstPage">
-            <v-text-field label="Nome" v-model="formData.nome" :rules="nameRules"/>
+            <v-text-field label="Nome" v-model="formData.nome" :rules="nameRules" required/>
             <v-text-field label="CPF" placeholder="000.000.000-00" v-model="formData.cpf" :rules="cpfRules"
-                          maxlength="11"/>
-
-            <v-text-field label="RG" v-model="formData.rg"/>
+                          maxlength="14" v-mask="['###.###.###-##']" required/>
+            <v-text-field label="RG" v-model="formData.rg" maxlength="9"/>
             <v-text-field label="E-mail" type="email" placeholder="seu_email@email.com" v-model="formData.email"
-                          :rules="emailRules"/>
-            <v-text-field label="Telefone" placeholder="(XX) XXXXX-XXXX" v-model="formData.telefone" maxlength="11"/>
+                          :rules="emailRules" required/>
+            <v-text-field label="Telefone" placeholder="(XX) XXXXX-XXXX" v-model="formData.telefone" maxlength="15"
+                          v-mask="['(##) #####-####']"
+            />
             <v-text-field label="Endereço" v-model="formData.endereco"/>
           </div>
-          <div v-show="secondPage">
+        </v-form>
+        <v-form ref="senhaForm">
+          <div v-show="!firstPage">
             <v-text-field
-                v-model="formData.senha"
+                v-model="senha"
                 :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
                 :type="visible ? 'text' : 'password'"
                 placeholder="Senha"
                 @click:append-inner="visible = !visible"
+                :rules="senhaRules"
+                maxlength="10"
             ></v-text-field>
             <v-text-field
-                v-model="formData.connfirmarSenha"
+                v-model="confirmarSenha"
                 :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
                 :type="visible ? 'text' : 'password'"
                 placeholder="Confirme a senha"
                 @click:append-inner="visible = !visible"
+                :rules="senhaRules"
+                maxlength="10"
             ></v-text-field>
+            <v-alert color="error" variant="outlined" text="Senha deve conter de 6 a 10 caracteres, contendo pelo menos
+            uma letra maiúscula, uma letra minuscula, um número e um caractere especial.">
+            </v-alert>
           </div>
         </v-form>
       </v-card-text>
       <v-card-actions>
-        <v-btn rounded="xl" class="ma-2 pa-2 bg-green-lighten-1" append-icon="mdi-arrow-right-thin" @click="validate">
+        <v-btn rounded="xl" v-show="!firstPage" prepend-icon="mdi-arrow-left-thin"
+               class="bg-green-lighten-3" @click="rollback()">
+          Voltar
+        </v-btn>
+        <v-btn rounded="xl" class="ma-2 pa-2 bg-green-lighten-1 d-flex justify-space-between"
+               append-icon="mdi-arrow-right-thin" @click="continueBtn">
           Continuar
         </v-btn>
       </v-card-actions>
@@ -50,32 +65,54 @@
 </template>
 
 <script>
+import {mask} from 'vue-the-mask'
+
 export default {
   name: 'CreateAccount',
+  directives: {mask},
   methods: {
     open() {
       this.dialog = true
     },
-    async validate() {
-      const {valid} = await this.$refs.form.validate()
-      if (valid) {
-        this.firstPage = false;
-        this.secondPage = true;
+    close() {
+      this.dialog = false;
+      this.firstPage = true;
+    },
+    rollback() {
+      this.firstPage = true;
+    },
+    async continueBtn() {
+      if (this.firstPage) {
+        const {valid} = await this.$refs.form.validate()
+        if (valid) {
+          this.firstPage = false
+        }
+      } else {
+        const {valid} = await this.$refs.senhaForm.validate()
+        if (valid) {
+          this.formData.senha = this.senha
+          this.close()
+        }
       }
-    }
+    },
+    validateEmailInput(emailInput) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(emailInput);
+
+    },
   },
   data() {
     return {
       dialog: false,
       firstPage: true,
-      secondPage: false,
       visible: false,
+      senha: null,
+      confirmarSenha: null,
       formData: {
         nome: null,
         cpf: null,
         email: null,
         senha: null,
-        connfirmarSenha: null,
         telefone: null,
         rg: null,
         endereco: null
@@ -86,10 +123,29 @@ export default {
       ],
       cpfRules: [
         v => !!v || 'CPF é obrigatório',
-        v => (v && v.length === 11) || 'CPF deve ter 11 caracteres',
+        v => (v && v.length === 14) || 'CPF deve ter 11 caracteres',
       ],
       emailRules: [
         v => !!v || 'E-mail é obrigatório',
+        v => this.validateEmailInput(v) || 'Digite um email válido'
+      ],
+      senhaRules: [
+        v => !!v || 'A senha deve ser preenchida',
+        v => v.length >= 6 || 'Mínimo 6 caracteres',
+        v => v.length <= 10 || 'Máximo 10 caracteres',
+        v => (/[a-z]/.test(v)) || 'Deve conter caracter minúsculo.',
+        v => (/[A-Z]/.test(v)) || 'Deve conter caracter maiúsculo',
+        v => /[^a-zA-Z0-9]/.test(v) || 'Deve conter caracter especial',
+        v => /[0-9]/.test(v) || 'Deve conter um número',
+        v => {
+          if (v) {
+            if (this.senha !== this.confirmarSenha) {
+              return 'As senhas devem ser iguais'
+            }
+            return true
+          }
+        }
+
       ]
     }
   },
