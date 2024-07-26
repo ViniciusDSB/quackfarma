@@ -20,9 +20,9 @@ class Login{
     //The validateFunctions() will check the format, size etc of the received data
     //if everything is fine the status remains OK, else, if anyhing ir wrong an error status is set
     validateData(){
-        this.status = defaultStats;
+        this.status = defaultStatus;
 
-        this.validadeEmail();
+        this.validateEmail();
         this.validatePassword();
     }
 }
@@ -120,4 +120,4 @@ class UserClient extends User{
 }
 
 
-module.exports = { Login, User, UserManager, UserClient, defaultStats};
+module.exports = { Login, User, UserManager, UserClient, defaultStatus};

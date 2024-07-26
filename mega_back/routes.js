@@ -8,21 +8,38 @@ const dbPool = require('./dbConnection');
 
 const{ Login, User , UserManager, UserClient , defaultStatus} = require("./myClasses");
 
+/*
+rotas existentes e seus campos{
+    /fazerLogin: email, password
+    /cadastrarAdm: name, email, senha
+    /cadastrarCli: name, cpf, email, password, rg, address, phone
+}
+*/
+
+const sha256 = require('js-sha256');
 router.post('/fazerLogin', async (req, res) => {
     const login = new Login(
         req.body.email,
         req.body.password
     );
-    login.validateEmail();
-    login.validatePassword();
+    login.validateData();
 
-    if(login.status){
+    if(login.status != defaultStatus){
+        //melhora pra buscar nos dois bancos, clientes e adm
+        //talvez tenha que mudar de query para client
+    }else{
         const queryResult = await dbPool.query('SELECT EXISTS (SELECT 1 FROM managers WHERE email = $1)', [login.email]);
         if(queryResult.rows[0].exists){
-
+            const queryResult = await dbPool.query('SELECT password_hash FROM managers WHERE email = $1', [login.email]);
+            passHash = sha256(`${login.password}`);
+            if(passHash == queryResult.rows[0].password_hash){
+                res.send("Login perfeito!")
+            }else{
+                res.send("Deu merda!");
+            }
+        }else{
+            res.send("Usuario não existe!")
         }
-    }else{
-        //take err status from user and redirect with that err message
     }
     
 
@@ -35,31 +52,30 @@ router.post('/fazerLogin', async (req, res) => {
 
 })
 
-/*
-rotas existentes e seus campos{
-    /fazerLogin: email, password
-    /cadastrarAdm: name, email, senha
-    /cadastrarCli: name, cpf, email, password, rg, address, phone
-}
-*/
 router.post('/cadastrarAdm', async (req, res) => {
-    try{
-        const manager = new UserManager(
-            req.body.name,
-            req.body.email,
-            req.body.password
-        );
-        manager.validateData();
-    
-        if(manager.status != defaultStats){
-            res.send("Teste falhou, veja o log");
-        }else{
-            res.send("Teste funcionou " + manager.name + "!");
-        }
-    }catch(err){
-        console.error('Erro na rota /cadastrarAdm', err.message);
-        res.status(500).send('Erro ao cadastrar administrador. Veirfique o log.');
+try{
+    const manager = new UserManager(
+        req.body.name,
+        req.body.email,
+        req.body.password
+    );
+    manager.validateData();
+
+    if(manager.status != defaultStatus){
+        res.send("Erro ao cadastrar admnistrador: " + manager.status);
+    }else{
+        manager_password = sha256(`${manager.password}`);
+        await dbPool.query(
+            'INSERT INTO managers (name, email, password_hash) VALUES ($1, $2, $3)', 
+            [manager.name, manager.email, manager_password]
+        )
+        res.send("Teste funcionou " + manager.name + "! <br>" + manager_password);
     }
+
+}catch(err){
+    console.error('Erro na rota /cadastrarAdm', err);
+    res.status(500).send('Erro ao cadastrar administrador. Veirfique o log.');
+}
 })
 
 router.post("/cadastrarCli", async (req, res) => {
@@ -87,7 +103,6 @@ router.post("/cadastrarCli", async (req, res) => {
     
 })
 
-
 router.post('/sendQuery', async (req, res) => {
     const userQuery = req.body.theQuery;
     try {
@@ -98,7 +113,6 @@ router.post('/sendQuery', async (req, res) => {
         res.status(500).send('Erro ao criar tabela. Veirfique o log.');
     }
 });
-
 
 router.get('/', async (req, res) => {
     try {
