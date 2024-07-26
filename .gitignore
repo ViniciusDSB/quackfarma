@@ -1,6 +1,6 @@
 docker_files
 mega_back/node_modules
 mega_front/node_modules
-builtQueries.txt
-dbStructure.txt
 usefulLinks.txt
+dbStructure.txt
+builtQueries.txt

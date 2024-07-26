@@ -6,7 +6,7 @@ const path = require('path');
 //database, pg pool (located at ./dbConnection.js)
 const dbPool = require('./dbConnection');
 
-const{ Login, User } = require("./myClasses");
+const{ Login, User , UserManager, UserClient , defaultStatus} = require("./myClasses");
 
 router.post('/fazerLogin', async (req, res) => {
     const login = new Login(
@@ -16,15 +16,18 @@ router.post('/fazerLogin', async (req, res) => {
     login.validateEmail();
     login.validatePassword();
 
-    /*if(data is correct){
-        make a query to validate on database and redirect to the next page with logged
+    if(login.status){
+        const queryResult = await dbPool.query('SELECT EXISTS (SELECT 1 FROM managers WHERE email = $1)', [login.email]);
+        if(queryResult.rows[0].exists){
+
+        }
     }else{
-        take err status from user and redirect with that err message
+        //take err status from user and redirect with that err message
     }
-    */
+    
 
     //prototype of validation
-    if(login.status == true){
+    if(login.status){
         res.send("Teste funcionou " + login.email);
     }else{
         res.send("Teste falhou, veja o log");
@@ -32,31 +35,71 @@ router.post('/fazerLogin', async (req, res) => {
 
 })
 
-router.post("/criarUsuario", async (req, res) => {
-    const user = new User(
-        req.body.name,
-        req.body.cpf,
-        req.body.email,
-        req.body.password,
-        req.body.age,
-        req.body.phone
-    );
-    user.validateData();
-
-    /*if(data is correct){
-        make a query to save the user data on the database and redirect to the next page with user data
-    }else{
-        take err status from user and redirect with that err message
-    }
-    */
-    if(user.status == true){
-        res.send("Teste funcionou " + user.name + "!");
-    }else{
-        res.send("Teste falhou, veja o log");
+/*
+rotas existentes e seus campos{
+    /fazerLogin: email, password
+    /cadastrarAdm: name, email, senha
+    /cadastrarCli: name, cpf, email, password, rg, address, phone
+}
+*/
+router.post('/cadastrarAdm', async (req, res) => {
+    try{
+        const manager = new UserManager(
+            req.body.name,
+            req.body.email,
+            req.body.password
+        );
+        manager.validateData();
+    
+        if(manager.status != defaultStats){
+            res.send("Teste falhou, veja o log");
+        }else{
+            res.send("Teste funcionou " + manager.name + "!");
+        }
+    }catch(err){
+        console.error('Erro na rota /cadastrarAdm', err.message);
+        res.status(500).send('Erro ao cadastrar administrador. Veirfique o log.');
     }
 })
 
-//basic test routes
+router.post("/cadastrarCli", async (req, res) => {
+    try{
+        const user = new UserClient(
+            req.body.name,
+            req.body.cpf,
+            req.body.email,
+            req.body.password,
+            req.body.rg,
+            req.body.address,
+            req.body.phone
+        );
+        user.validateData();
+    
+        if(user.status != defaultStatus){
+            res.send("Teste falhou, veja o log " + user.status + " veja!");
+        }else{
+            res.send("Teste funcionou " + user.name + "!");
+        }
+    }catch(err){
+        console.error('Erro na rota /cadastrarCli', err);
+        res.status(500).send('Erro ao cadastrar cliente. Veirfique o log.');
+    }
+    
+})
+
+
+router.post('/sendQuery', async (req, res) => {
+    const userQuery = req.body.theQuery;
+    try {
+        const queryResult = await dbPool.query(userQuery);
+        res.send(queryResult);
+    } catch (error) {
+        console.error('Erro na rota /:', error.message);
+        res.status(500).send('Erro ao criar tabela. Veirfique o log.');
+    }
+});
+
+
 router.get('/', async (req, res) => {
     try {
         await dbPool.query('CREATE TABLE IF NOT EXISTS testes (id SERIAL PRIMARY KEY, nome VARCHAR(100), idade INT)');

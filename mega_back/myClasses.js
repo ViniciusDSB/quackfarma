@@ -1,104 +1,182 @@
+const defaultStatus = "OK";
+
 class Login{
     constructor(loginEmail, loginPassword){
         this.email = loginEmail;
         this.password = loginPassword;
     }
+
     validateEmail(){
-        if(true){
-            this.status = true;
-        }else{
-            this.status = false;
+        if(false){
+            this.status = "Email inválido";
         }
     }
     validatePassword(){
-        if(true){
-            this.status =true;
-        }else{
-            this.status = false;
+        if(false){
+            this.status = "Senha inválida";
         }
     }
-}
 
-/*
-nome varchar(255) [not null]
-    cpf varchar(11) [not null]
-    email varchar(255) [not null]
-    senha varchar(256) [not null] //6 a 10 caracteres, mas aqui no banco fica so a hash
-    idade integer //idade maxima/quantidade maxima de caracteres na idade
-    telefone integer //11 caracteres, formato (DDD)9-1234-5678
-     */
-
-class User{
-    constructor(name, cpf, email, password, age, phone){
-        this.name = name;
-        this.cpf = cpf;
-        this.email = email;
-        this.password = password;
-        this.age = age;
-        this.phone = phone;
-    }
-
-    //prototypes only; the validateFunctions() will check the formar, size etc of the received data
-    //if they are correct it will set a OK status that allows the rote to proced, 
-    //saving data in the database and redirectign the user
-    //if data is not correct it sets an error status
-
+    //The validateFunctions() will check the format, size etc of the received data
+    //if everything is fine the status remains OK, else, if anyhing ir wrong an error status is set
     validateData(){
-        this.validateName();
-        this.validateCpf();
+        this.status = defaultStatus;
+
         this.validateEmail();
         this.validatePassword();
-        this.validateAge();
-        this.validatePhone();
-
-        if(true){
-            this.status = true;
-        }else{
-            this.status = false;
-        }
-    }
-    validateName(){
-        if(true){
-            return true;
-        }else{
-            return false;
-        }
-    }
-    validateCpf(){
-        if(true){
-            return true;
-        }else{
-            return false;
-        }
-    }
-    validateEmail(){
-        if(true){
-            return true;
-        }else{
-            return false;
-        }
-    }
-    validatePassword(){
-        if(true){
-            return true;
-        }else{
-            return false;
-        }
-    }
-    validateAge(){
-        if(true){
-            return true;
-        }else{
-            return false;
-        }
-    }
-    validatePhone(){
-        if(true){
-            return true;
-        }else{
-            return false;
-        }
     }
 }
 
-module.exports = { Login, User}
+class User{
+    constructor(name, email, password){
+        this.name = name;
+        this.email = email;
+        this.password = password;
+    }
+    validateName(){
+        const TestName = /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/;
+        switch(true){
+            case !this.name:
+                this.status = "O nome não pode ser vazio!";
+                break;
+            case !TestName.test(this.name):
+                this.status = "O nome deve conter apenas letras e espaços!";
+                break;
+            default:
+                break;
+        }
+    }
+    validateEmail(){
+        const TestEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if(!TestEmail.test(this.email)){
+            this.status = "Email inválido";
+        }
+    }
+    validatePassword(){
+        const TestPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,10}$/;
+        if(!TestPassword.test(this.password)){
+            this.status = "Senha inválido";
+        }
+    }
+
+    validateData(){
+        this.status = defaultStatus;
+
+        this.validateName();
+        this.validateEmail();
+        this.validatePassword();
+    }
+}
+
+
+class UserManager extends User{
+    constructor(name, email, password){
+        super(name, email, password);
+    }
+}
+class UserClient extends User{
+    constructor(name, cpf, email, password, rg, address, phone){
+        super(name, email, password);
+        this.cpf = cpf;
+        this.rg = rg;
+        this.phone = phone;
+        this.address = address;
+    }
+
+    validateCpf(){
+        switch(true){
+            case this.cpf == "":
+                this.status = "CPF vazio!";
+                break;
+            case !/^\d{11}$/.test(this.cpf): //Verifica se há 11 dígitos
+                this.status = "CPF inválido!";
+                break;
+            case VerificadorCpf(this.cpf) == false:
+                this.status = "CPF inválido!";
+                break;
+            case /^(\d)\1{10}$/.test(this.cpf): //Verifica se os digitos não são todos iguais
+                this.status = "CPF inválido!";
+                break;
+            default:
+                break;
+        }
+    }
+
+    validateRg(){
+        switch(true){
+            case this.cpf == "":
+                this.address = null;
+                break;
+            case !/^[A-Z]{0,2}[0-9]{7,9}$/.test(this.rg):
+                this.status = "RG possui 7 à 9 caracteres!";
+                break;
+            default:
+                break;
+        }
+    }
+    validatePhone(){       
+        switch(true){ 
+            case this.phone == "":
+                this.phone = null;
+                break;
+            case !/^\(?\d{2}\)?[\s-]?\d{4,5}-?\d{4}$/.test(this.phone):
+                this.status = "Número de telefone inválido!";
+                break;
+            default:
+                break;
+        }
+    }
+    validateAddress(){     
+        switch(true){
+            case this.address == "":
+                this.address = null;
+                break;
+            case this.address.length < 5:
+                this.status = "O endereço deve ter pelo menos 5 caracteres!"
+                break;
+            case !/^(?=.*[A-Za-z])[A-Za-z0-9\s-]*$/.test(this.address):
+                this.status = "Endereço inválido!";
+                break;
+            default:
+                break;
+        }   
+    }
+
+    validateData(){
+        this.status = defaultStatus;
+
+        this.validateName();
+        this.validateEmail();
+        this.validatePassword();
+        this.validateCpf();
+        this.validateRg();
+        this.validateAddress();
+        this.validatePhone();
+    }
+}
+
+function VerificadorCpf(cpf) {
+    const Digitos = (cpf, fator) => {
+        let total = 0;
+        for (let i = 0; i < fator - 1; i++) {
+            total += parseInt(cpf[i]) * (fator - i);
+        }
+        const resto = (total * 10) % 11;
+        return resto === 10 ? 0 : resto;
+    };
+
+    const PrimeiroDigito = Digitos(cpf, 10);
+    if (PrimeiroDigito !== parseInt(cpf[9])) {
+        return false;
+    }
+
+    const SegundoDigito = Digitos(cpf, 11);
+    if (SegundoDigito !== parseInt(cpf[10])) {
+        return false;
+    }
+
+    return true;
+}
+
+module.exports = { Login, User, UserManager, UserClient, defaultStatus};
