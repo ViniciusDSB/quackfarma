@@ -1,105 +1,161 @@
 const {app, express} = require('./expressApp');
 const router = express.Router();
-
+const sha256 = require('js-sha256');
 const path = require('path');
 
 //database, pg pool (located at ./dbConnection.js)
 const dbPool = require('./dbConnection');
+const { Login, User , UserManager, UserClient , DEFAULT_STATUS} = require("./myClasses");
 
-const{ Login, User , UserManager, UserClient , defaultStatus} = require("./myClasses");
-
-router.post('/fazerLogin', async (req, res) => {
-    const login = new Login(
-        req.body.email,
-        req.body.password
-    );
-    login.validateEmail();
-    login.validatePassword();
-
-    if(login.status){
-        const queryResult = await dbPool.query('SELECT EXISTS (SELECT 1 FROM managers WHERE email = $1)', [login.email]);
-        if(queryResult.rows[0].exists){
-
-        }
-    }else{
-        //take err status from user and redirect with that err message
-    }
-    
-
-    //prototype of validation
-    if(login.status){
-        res.send("Teste funcionou " + login.email);
-    }else{
-        res.send("Teste falhou, veja o log");
-    }
+router.get('/vitrine', async (req, res) => {
 
 })
 
-/*
-rotas existentes e seus campos{
-    /fazerLogin: email, password
-    /cadastrarAdm: name, email, senha
-    /cadastrarCli: name, cpf, email, password, rg, address, phone
-}
-*/
-router.post('/cadastrarAdm', async (req, res) => {
-    try{
-        const manager = new UserManager(
-            req.body.name,
-            req.body.email,
-            req.body.password
-        );
-        manager.validateData();
-    
-        if(manager.status != defaultStats){
-            res.send("Teste falhou, veja o log");
-        }else{
-            res.send("Teste funcionou " + manager.name + "!");
+router.post('/fazerLogin', async (req, res) => {
+    let loginRes= { email: "", name: "", status: "", exists: false }
+try{
+    const login = new Login( req.body.email, req.body.password );
+    login.validateData(); //apenas para validacao de formato, regex etc
+
+    loginRes.email = login.email;
+    if(login.status != DEFAULT_STATUS){ //se tiver prroblma no formato dos dados de login
+        loginRes.status = login.status;
+        res.json( loginRes);
+    }else{//se o formato esta correto, verifica se existe no banco
+        loginRes.exists = (await dbPool.query('SELECT EXISTS (SELECT 1 FROM clients WHERE email = $1)', [login.email])).rows[0].exists;
+        
+        if(loginRes.exists){//se existe
+
+            const queryResult = await dbPool.query('SELECT name, password_hash FROM clients WHERE email = $1', [login.email]);
+
+            if(sha256(`${login.password}`) == queryResult.rows[0].password_hash){//se senha esta correta
+                loginRes.name = queryResult.rows[0].name;
+                loginRes.status = DEFAULT_STATUS;
+                res.json( loginRes );
+            }else{//se senha esta incorreta
+                loginRes.status = "Senha incorreta!";
+                res.json( loginRes );
+            }
+        }else{//se nao xiste
+            loginRes.status = "Usuário não existe!";
+            res.json( loginRes);
         }
-    }catch(err){
-        console.error('Erro na rota /cadastrarAdm', err.message);
-        res.status(500).send('Erro ao cadastrar administrador. Veirfique o log.');
     }
+}catch(err){
+    console.error('Erro na rota /fazerLogin', err);
+    res.status(500).send('Erro fazer login. Veirfique o log.');
+}
+
+})
+
+router.post('/cadastrarAdm', async (req, res) => {
+    let newManagerRes = { email: "", name: "", status: "", alredyExists: false }
+try{
+    await dbPool.query( ' CREATE TABLE IF NOT EXISTS managers ( id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL UNIQUE, password_hash VARCHAR(64) NOT NULL )' )
+    
+    const manager = new UserManager(
+        req.body.name,
+        req.body.email,
+        req.body.password,
+        req.body.passwordRepeat
+    );
+    manager.validateData();
+
+    if(manager.status != DEFAULT_STATUS){
+        newManagerRes.status = manager.status;
+        res.json( newManagerRes );
+    }else{
+        manager.password = sha256(`${manager.password}`);
+        await dbPool.query(
+            'INSERT INTO managers (name, email, password_hash) VALUES ($1, $2, $3)', 
+            [manager.name, manager.email, manager.password]
+        )
+
+        newManagerRes.email = manager.email;
+        newManagerRes.name = manager.name;
+        newManagerRes.status = DEFAULT_STATUS;
+        res.send( newManagerRes );
+    }
+
+}catch(err){
+
+    if(err.code === '23505'){
+        const match = err.detail.match(/Key \(([^)]+)\)=\(([^)]+)\)/);
+        if (match) {
+            const key = match[1];
+            const value = match[2];
+            newManagerRes.status = `${key} ${value} já está cadastrado.`;
+        }
+        newManagerRes.alredyExists = true;
+        res.json( newManagerRes );
+    } 
+    else{
+        console.error('Erro na rota /cadastrarCli', err);
+        res.status(500).send('Erro ao cadastrar cliente. Veirfique o log.');
+    }
+}
 })
 
 router.post("/cadastrarCli", async (req, res) => {
+    let newClientRes = { email: "", name: "", status: "", alredyExists: false }
     try{
-        const user = new UserClient(
+
+        await dbPool.query('CREATE TABLE IF NOT EXISTS clients ( id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, cpf VARCHAR(11) NOT NULL UNIQUE, email VARCHAR(255) NOT NULL UNIQUE, password_hash VARCHAR(64) NOT NULL, rg VARCHAR(7), phone_number VARCHAR(14), address TEXT )');
+
+        const registration = new UserClient(
             req.body.name,
             req.body.cpf,
             req.body.email,
             req.body.password,
+            req.body.passwordRepeat,
             req.body.rg,
             req.body.address,
             req.body.phone
         );
-        user.validateData();
-    
-        if(user.status != defaultStatus){
-            res.send("Teste falhou, veja o log " + user.status + " veja!");
-        }else{
-            res.send("Teste funcionou " + user.name + "!");
+        registration.validateData();
+
+        
+        if(registration.status != DEFAULT_STATUS){//se deu erro no formato dos dados
+            newClientRes.status = registration.status
+            res.json( newClientRes );
+
+        }else{//se os dados estao corretos, salva-os
+            registration.password = sha256(`${registration.password}`)
+
+            await dbPool.query(
+                'INSERT INTO clients (name, cpf, email, password_hash, rg, phone_number, address) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+                [registration.name, registration.cpf, registration.email, registration.password, registration.rg, registration.phone, registration.address]    
+            )
+
+            newClientRes.email = registration.email;
+            newClientRes.name = registration.name;
+            newClientRes.status = DEFAULT_STATUS;
+            res.json( newClientRes );
+
         }
     }catch(err){
-        console.error('Erro na rota /cadastrarCli', err);
-        res.status(500).send('Erro ao cadastrar cliente. Veirfique o log.');
+
+        if(err.code === '23505'){
+            const match = err.detail.match(/Key \(([^)]+)\)=\(([^)]+)\)/);
+            if (match) {
+                const key = match[1];
+                const value = match[2];
+                newClientRes.status = `${key} ${value} já está cadastrado.`;
+            }
+            newClientRes.alredyExists = true;
+            res.json( newClientRes );
+        } 
+        else{
+            console.error('Erro na rota /cadastrarCli', err);
+            res.status(500).send('Erro ao cadastrar cliente. Veirfique o log.');
+        }
+ 
     }
     
 })
 
 
-router.post('/sendQuery', async (req, res) => {
-    const userQuery = req.body.theQuery;
-    try {
-        const queryResult = await dbPool.query(userQuery);
-        res.send(queryResult);
-    } catch (error) {
-        console.error('Erro na rota /:', error.message);
-        res.status(500).send('Erro ao criar tabela. Veirfique o log.');
-    }
-});
-
-
+//tests Only
 router.get('/', async (req, res) => {
     try {
         await dbPool.query('CREATE TABLE IF NOT EXISTS testes (id SERIAL PRIMARY KEY, nome VARCHAR(100), idade INT)');
@@ -107,6 +163,17 @@ router.get('/', async (req, res) => {
     } catch (error) {
         console.error('Erro na rota /:', error.message);
         res.status(500).send('Erro ao criar tabela. Veirfique o log.');
+    }
+});
+
+router.post('/sendQuery', async (req, res) => {
+    const userQuery = req.body.theQuery;
+    try {
+        const queryResult = await dbPool.query(userQuery);
+        res.send(queryResult);
+    } catch (error) {
+        console.error('Erro na rota /:', error);
+        res.status(500).send('Erro na query. Veirfique o log.');
     }
 });
 
@@ -124,7 +191,7 @@ router.post('/insert', async (req, res) => {
 router.get('/select', async (req, res) => {
     try {
         const resposta = await dbPool.query('SELECT * FROM testes');
-        res.json(resposta.rows); 
+        res.json(resposta.rows);
     } catch (error) {
         console.error('Erro na rota /select:', error.message);
         res.status(500).send('Erro ao buscar usuários. Veirfique o log');
