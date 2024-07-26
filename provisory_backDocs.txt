@@ -1,0 +1,18 @@
+rotas existentes e seus campos{
+    /vitrine
+    /fazerLogin: email, password
+    /cadastrarAdm: name, email, senha
+    /cadastrarCli: name, cpf, email, password, rg, address, phone
+}
+
+/fazerLogin: recebe um campo de nome email e um de nome passowrd, faz as validações e retorna um json da forma:
+    loginRes = { email: "", name: "", status: "OK/outros", exists: true/false }
+    Caso tudo esteja correto o loginRes.status será "OK" e terá o email fornecido e o nome do usuario
+    Se algum problema ocorrer então loginRes.status != "OK", isto é, status será uma mensagem indicando o erro
+
+/cadastrarAdm
+
+/cadastrarCli, recebe os campos: name, cpf, email, password, rg, address, phone;
+    newClientRes = { email: "", name: "", status: "OK/outros", exists: true/false }
+    Mesmo esquema da rota anterior: se tudo tiver dado certo retorna status = "OK" e caso contrario
+    status = "mensagem de erro"

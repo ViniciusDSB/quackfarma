@@ -1,4 +1,4 @@
-const defaultStatus = "OK";
+const DEFAULT_STATUS = "OK";
 
 class Login{
     constructor(loginEmail, loginPassword){
@@ -20,7 +20,7 @@ class Login{
     //The validateFunctions() will check the format, size etc of the received data
     //if everything is fine the status remains OK, else, if anyhing ir wrong an error status is set
     validateData(){
-        this.status = defaultStatus;
+        this.status = DEFAULT_STATUS;
 
         this.validateEmail();
         this.validatePassword();
@@ -28,10 +28,11 @@ class Login{
 }
 
 class User{
-    constructor(name, email, password){
+    constructor(name, email, password, passwordRepeat){
         this.name = name;
         this.email = email;
         this.pasword = password;
+        this.passwordRepeat = passwordRepeat
     }
     validateName(){
         if(false){
@@ -50,7 +51,7 @@ class User{
     }
 
     validateData(){
-        this.status = defaultStatus;
+        this.status = DEFAULT_STATUS;
 
         this.validateName();
         this.validateEmail();
@@ -65,8 +66,8 @@ class UserManager extends User{
     }
 }
 class UserClient extends User{
-    constructor(name, cpf, email, password, rg, address, phone){
-        super(name, email, password);
+    constructor(name, cpf, email, password, passwordRepeat, rg, address, phone){
+        super(name, email, password, passwordRepeat);
         this.cpf = cpf;
         this.rg = rg;
         this.address = address;
@@ -106,7 +107,7 @@ class UserClient extends User{
     }
 
     validateData(){
-        this.status = defaultStatus;
+        this.status = DEFAULT_STATUS;
 
         this.validateName();
         this.validateEmail();
@@ -120,4 +121,4 @@ class UserClient extends User{
 }
 
 
-module.exports = { Login, User, UserManager, UserClient, defaultStatus};
+module.exports = { Login, User, UserManager, UserClient, DEFAULT_STATUS};
