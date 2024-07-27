@@ -8,9 +8,9 @@ import * as directives from 'vuetify/directives'
 import * as mdiicon from '@mdi/font/css/materialdesignicons.css'
 import *  as fsicom from '@fortawesome/fontawesome-free/css/all.css'
 
-
 // Components
 import App from './App.vue'
+import router from "@/router";
 
 const vuetify = createVuetify({
     components,
@@ -19,4 +19,4 @@ const vuetify = createVuetify({
     fsicom
 })
 
-createApp(App).use(vuetify).mount('#app')
+createApp(App).use(vuetify).use(router).mount('#app')
