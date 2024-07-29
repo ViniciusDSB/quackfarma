@@ -1,4 +1,4 @@
-const dbPool = require('./dbConnection');
+const dbPool = require('../dbConnection');
 async function setMedicines(){
 
     
@@ -25,3 +25,5 @@ async function setMedicines(){
         ['Metformina', 'Utilizado no tratamento de diabetes tipo 2.', true, 30.00, 90, 1, new Date(), new Date()]
     );console.log("done");
 }
+
+module.exports = { setMedicines };

@@ -36,23 +36,24 @@ router.post("/adicionarProduto", async (req, res) => {
             await dbPool.query( 'INSERT INTO medicines ( name,  description,  needs_recipe,  unit_price,  on_stock,  manager,  created_at,  last_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
                 [medicine.name, medicine.description, medicine.needsRecipe, medicine.unitPrice, medicine.stockAmount, medicine.whoAdded, new Date(), new Date()]);
                    
-            res.status(OK).json( {'message': 'Medicamnto adicionado ao estoque!'} );
+            res.status(OK).json( {'message': 'Medicamento adicionado ao estoque!'} );
         }else{
             res.status(BAD_REQUEST).json( {'message': medicine.status} );
         }
 
     }catch(err){
         console.error('Erro na rota /adicionarProduto', err);
-        res.status(SERVER_ERR).send('Erro adicionar produto. Veirfique o log.');
+        res.status(SERVER_ERR).send('Erro ao adicionar produto. Verifique o log.');
     }
 })
 
 router.get('/vitrine', async (req, res) => {
     try{
-        
+        const medicamentos = await dbPool.query(`SELECT name, description, unit_price, needs_recipe FROM medicines`);
+        res.json(medicamentos.rows);
     }catch(err){
         console.error('Erro na rota /vitrine', err);
-        res.status(SERVER_ERR).send('Erro encontrar produtos. Veirfique o log.');
+        res.status(SERVER_ERR).send('Erro ao encontrar produtos. Verifique o log.');
     }
 })
 
