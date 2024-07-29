@@ -1,4 +1,4 @@
-const DEFAULT_STATUS = "OK";
+const DEFAULT_MESSAGE = "OK";
 
 class Login{
     constructor(loginEmail, loginPassword){
@@ -10,20 +10,27 @@ class Login{
         const TestEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         if(!TestEmail.test(this.email)){
-            this.status = "Email inválido";
+            this.status = "Formato de email inválido";
         }
     }
     validatePassword(){
         const TestPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,10}$/;
-        if(!TestPassword.test(this.password)){
-            this.status = "Senha inválida";
+        switch(true){
+            case this.password == "":
+                this.status = "O campo de senha não foi preenchido";
+                break;
+            case !TestPassword.test(this.password):
+                this.status = "Formato de senha inválido";
+                break;
+            default:
+                break;
         }
     }
 
     //The validateFunctions() will check the format, size etc of the received data
     //if everything is fine the status remains OK, else, if anyhing ir wrong an error status is set
     validateData(){
-        this.status = DEFAULT_STATUS;
+        this.status = DEFAULT_MESSAGE;
 
         this.validateEmail();
         this.validatePassword();
@@ -37,6 +44,12 @@ class User{
         this.password = password;
         this.passwordRepeat = passwordRepeat
     }
+
+    validateData(){
+        this.status = DEFAULT_MESSAGE;
+        this.validateName();
+    }
+
     validateName(){
         const TestName = /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/;
         switch(true){
@@ -47,6 +60,7 @@ class User{
                 this.status = "O nome deve conter apenas letras e espaços!";
                 break;
             default:
+                this.validateEmail();
                 break;
         }
     }
@@ -54,14 +68,20 @@ class User{
         const TestEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         if(!TestEmail.test(this.email)){
-            this.status = "Email inválido";
-        }
+            this.status = "Formato de email inválido";
+        }else{
+
+            this.validatePassword();
+        }    
     }
     validatePassword(){
         const TestPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,10}$/;
         switch(true){
+            case this.password == "":
+                this.status = "O campo de senha não foi preenchido";
+                break;
             case !TestPassword.test(this.password):
-                this.status = "Senha inválida";
+                this.status = "Formato de senha inválido";
                 break;
             case this.password != this.passwordRepeat:
                 this.status = "As senhas não são iguais!";
@@ -69,14 +89,6 @@ class User{
             default:
                 break;
         }
-    }
-
-    validateData(){
-        this.status = DEFAULT_STATUS;
-
-        this.validateName();
-        this.validateEmail();
-        this.validatePassword();
     }
 }
 
@@ -95,21 +107,29 @@ class UserClient extends User{
         this.address = address;
     }
 
+    validateData(){
+        this.status = DEFAULT_MESSAGE;
+
+        this.validateName(); //from standard class
+        this.validateCpf(); //for this extended class
+    }
+
     validateCpf(){
         switch(true){
             case this.cpf == "":
-                this.status = "CPF n'ao pode ser vazio!";
+                this.status = "CPF não pode ser vazio!";
                 break;
             case !/^\d{11}$/.test(this.cpf): //Verifica se há 11 dígitos
-                this.status = "CPF inválido; Deve conter apenas 11 digitos!";
+                this.status = "CPF inválido; Deve conter 11 digitos!";
                 break;
             case VerificadorCpf(this.cpf) == false:
-                this.status = "CPF inválido!";
+                this.status = "O CPF fotnecido é inválido!";
                 break;
             case /^(\d)\1{10}$/.test(this.cpf): //Verifica se os digitos não são todos iguais
                 this.status = "CPF inválido!";
                 break;
             default:
+                this.validateRg();
                 break;
         }
     }
@@ -123,6 +143,7 @@ class UserClient extends User{
                 this.status = "RG deve possuir de 7 à 9 caracteres!";
                 break;
             default:
+                this.validatePhone();
                 break;
         }
     }
@@ -135,6 +156,7 @@ class UserClient extends User{
                 this.status = "Número de telefone inválido!";
                 break;
             default:
+                this.validateAddress();
                 break;
         }
     }
@@ -152,18 +174,6 @@ class UserClient extends User{
             default:
                 break;
         }   
-    }
-
-    validateData(){
-        this.status = DEFAULT_STATUS;
-
-        this.validateName();
-        this.validateEmail();
-        this.validatePassword();
-        this.validateCpf();
-        this.validateRg();
-        this.validateAddress();
-        this.validatePhone();
     }
 }
 
@@ -190,4 +200,4 @@ function VerificadorCpf(cpf) {
     return true;
 }
 
-module.exports = { Login, User, UserManager, UserClient, DEFAULT_STATUS};
+module.exports = { Login, User, UserManager, UserClient, DEFAULT_MESSAGE};
