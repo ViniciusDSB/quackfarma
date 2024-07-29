@@ -1,0 +1,199 @@
+openapi: 3.0.0
+info:
+  version: '1.0'
+  title: mega_back endpoints documentation
+  description: routes, requests and responses of our server
+paths: 
+  /cadastrarCli:
+    post:
+      summary: Validate data and save a new client on database.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                cpf:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                passwordRepeat:
+                  type: string
+                rg:
+                  type: integer
+                address:
+                  type: string
+                phone:
+                  type: integer
+      responses:
+        '201':
+          description: client registration created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  email:
+                    type: string
+                  name:
+                    type: string
+        '400':
+          description: some data may be invalid, wrong sintax, characters, size etc
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  email:
+                    type: string
+                  name:
+                    type: string
+        '401':
+          description: unauthorized credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  email:
+                    type: string
+                  name:
+                    type: string
+        '500':
+          description: client registration created
+        
+  /cadastrarAdm:
+    post:
+      summary: Validade data and savee a new cliente on database.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                passwordRepeat:
+                  type: string
+      responses:
+        '201':
+          description: client registration created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  email:
+                    type: string
+                  name:
+                    type: string
+        '400':
+          description: some data may be invalid, wrong sintax, characters, size etc
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  email:
+                    type: string
+                  name:
+                    type: string
+        '401':
+          description: unauthorized credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  email:
+                    type: string
+                  name:
+                    type: string
+        '500':
+          description: client registration created
+  
+  /fazerLogin:
+    post:
+      summary: Receive user data, checks the credentials and responds with a json.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '202':
+          description: login accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  email:
+                    type: string
+                  name:
+                    type: string
+        '401':
+          description: incorrect email or password
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  email:
+                    type: string
+                  name:
+                    type: string
+        '400':
+          description: data validation error, not an email, not allowed characters, etc
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  email:
+                    type: string
+                  name:
+                    type: string
+        '500':
+          description: client registration created
+
+servers:
+  url: http://localhost:3001
+    
+  # Added by API Auto Mocking Plugin
+  description: SwaggerHub API Auto Mocking
+  url: https://virtserver.swaggerhub.com/VINIDSB580/Mega_back/1.0
