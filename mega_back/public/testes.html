@@ -35,6 +35,12 @@
             color: green;
             border: 1px solid white;
         }
+        input[type="checkbox"] {
+            accent-color: green;
+            background-color: black;
+            border: 2px solid green;
+            cursor: pointer;
+        }
         button{
             background: none;
             color: white;
@@ -82,6 +88,23 @@
             <input type="email" name="email" placeholder="email"><br>
             <input type="password" name="password" placeholder="senha"><br>
             <button type="submit">Logar</button>
+        </form>
+
+        <form action="/adicionarProduto" method="post">
+            <h2>Adiiconar ao estoque</h2>
+            <input type="text" name="medName" placeholder="nome">
+            <input type="text" name="medDescription" placeholder="Descrição">
+            <input type="number" name="medUnitPrice" step="0.01" placeholder="Preço da unidade">
+            <input type="number" name="amountOnStock" placeholder="Qtd. em estoque">
+            <input type="number" name="managerWhoAdded" placeholder="Quem adicionou" value=1>
+            <input type="checkbox" name="needsRecipe"id="needRecipeCheckBox">
+            <label for="needRecipeCheckBox">Precisa de receita?</label>
+            <button type="submit">Salvar</button>
+        </form>
+
+        <form action="/vitrine" method="get">
+            <h2>Ver estoque</h2>
+            <button type="submit">Ver medicamentos</button>
         </form>
     </div>
 

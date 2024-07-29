@@ -5,18 +5,55 @@ const path = require('path');
 
 
 //http codes 
-const CREATED = 201
-const ACCEPTED = 202
-const BAD_REQUEST = 400
-const UNAUTHORIZED = 401
-const SERVER_ERR = 500
+const OK = 200;
+const CREATED = 201;
+const ACCEPTED = 202;
+const BAD_REQUEST = 400;
+const UNAUTHORIZED = 401;
+const SERVER_ERR = 500;
 
 //database, pg pool (located at ./dbConnection.js)
 const dbPool = require('./dbConnection');
-const { Login, User , UserManager, UserClient , DEFAULT_MESSAGE} = require("./myClasses");
+const { Login, User , UserManager, UserClient , Medicine, DEFAULT_MESSAGE} = require("./myClasses");
+
+
+router.post("/adicionarProduto", async (req, res) => {
+    try{
+        await dbPool.query('CREATE TABLE IF NOT EXISTS medicines ( id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, description TEXT NOT NULL, needs_recipe BOOLEAN NOT NULL, unit_price NUMERIC(10, 2) NOT NULL, on_stock INTEGER NOT NULL, manager INTEGER REFERENCES managers(id), created_at TIMESTAMP, last_update TIMESTAMP)');
+        const needsRecipe = req.body.needsRecipe? true : false;
+        const medicine = new Medicine(
+            req.body.medName,
+            req.body.medDescription,
+            req.body.medUnitPrice,
+            req.body.amountOnStock,
+            req.body.managerWhoAdded,
+            needsRecipe
+        );
+        medicine.validadeData();
+    
+        if(medicine.status === DEFAULT_MESSAGE){
+
+            await dbPool.query( 'INSERT INTO medicines ( name,  description,  needs_recipe,  unit_price,  on_stock,  manager,  created_at,  last_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
+                [medicine.name, medicine.description, medicine.needsRecipe, medicine.unitPrice, medicine.stockAmount, medicine.whoAdded, new Date(), new Date()]);
+                   
+            res.status(OK).json( {'message': 'Medicamnto adicionado ao estoque!'} );
+        }else{
+            res.status(BAD_REQUEST).json( {'message': medicine.status} );
+        }
+
+    }catch(err){
+        console.error('Erro na rota /adicionarProduto', err);
+        res.status(SERVER_ERR).send('Erro adicionar produto. Veirfique o log.');
+    }
+})
 
 router.get('/vitrine', async (req, res) => {
-
+    try{
+        
+    }catch(err){
+        console.error('Erro na rota /vitrine', err);
+        res.status(SERVER_ERR).send('Erro encontrar produtos. Veirfique o log.');
+    }
 })
 
 
@@ -99,7 +136,7 @@ try{
     } 
     else{
         console.error('Erro na rota /cadastrarCli', err);
-        res.status(SERVER_ERR).send('Erro ao cadastrar cliente. Veirfique o log.');
+        res.status(SERVER_ERR).send('Erro ao cadastrar administrador. Veirfique o log.');
     }
 }
 })
