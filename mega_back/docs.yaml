@@ -40,9 +40,8 @@ paths:
           description: some invalid data, invalid sintax etc
         '500':
           description: server internal error
-
-#não terminada
-  /vitrine:
+  
+  /listarMedicamentos:
     get:
       summary: Returs a list of medicines
       responses:

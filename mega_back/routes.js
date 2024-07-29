@@ -19,7 +19,17 @@ const { Login, User , UserManager, UserClient , Medicine, DEFAULT_MESSAGE} = req
 
 router.post("/adicionarProduto", async (req, res) => {
     try{
-        await dbPool.query('CREATE TABLE IF NOT EXISTS medicines ( id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, description TEXT NOT NULL, needs_recipe BOOLEAN NOT NULL, unit_price NUMERIC(10, 2) NOT NULL, on_stock INTEGER NOT NULL, manager INTEGER REFERENCES managers(id), created_at TIMESTAMP, last_update TIMESTAMP)');
+        await dbPool.query(`CREATE TABLE IF NOT EXISTS medicines(
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            description TEXT NOT NULL,
+            needs_recipe BOOLEAN NOT NULL,
+            unit_price NUMERIC(10, 2) NOT NULL,
+            on_stock INTEGER NOT NULL,
+            manager INTEGER REFERENCES managers(id),
+            created_at TIMESTAMP,
+            last_update TIMESTAMP)`);
+            
         const needsRecipe = req.body.needsRecipe? true : false;
         const medicine = new Medicine(
             req.body.medName,
@@ -33,8 +43,24 @@ router.post("/adicionarProduto", async (req, res) => {
     
         if(medicine.status === DEFAULT_MESSAGE){
 
-            await dbPool.query( 'INSERT INTO medicines ( name,  description,  needs_recipe,  unit_price,  on_stock,  manager,  created_at,  last_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
-                [medicine.name, medicine.description, medicine.needsRecipe, medicine.unitPrice, medicine.stockAmount, medicine.whoAdded, new Date(), new Date()]);
+            await dbPool.query(`INSERT INTO medicines (
+                name, 
+                description, 
+                needs_recipe, 
+                unit_price, 
+                on_stock, 
+                manager, 
+                created_at,
+                last_update)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+                [medicine.name,
+                    medicine.description,
+                    medicine.needsRecipe,
+                    medicine.unitPrice,
+                    medicine.stockAmount,
+                    medicine.whoAdded, 
+                    new Date(), new Date()
+                ]);
                    
             res.status(OK).json( {'message': 'Medicamento adicionado ao estoque!'} );
         }else{
@@ -47,12 +73,20 @@ router.post("/adicionarProduto", async (req, res) => {
     }
 })
 
-router.get('/vitrine', async (req, res) => {
+router.get('/listarMedicamentos', async (req, res) => {
     try{
-        const medicamentos = await dbPool.query(`SELECT name, description, unit_price, needs_recipe FROM medicines`);
-        res.json(medicamentos.rows);
+
+        const medicamentos = await dbPool.query(`SELECT 
+            name, 
+            description, 
+            unit_price, 
+            needs_recipe 
+            FROM medicines`);
+            
+        res.status(OK).json( {'message': "OK", 'medicineList': medicamentos.rows} );
+
     }catch(err){
-        console.error('Erro na rota /vitrine', err);
+        console.error('Erro na rota /listarMedicamentos', err);
         res.status(SERVER_ERR).send('Erro ao encontrar produtos. Verifique o log.');
     }
 })
@@ -98,7 +132,12 @@ try{
 router.post('/cadastrarAdm', async (req, res) => {
     let newManagerRes = { message: "", email: "", name: "" }
 try{
-    await dbPool.query( ' CREATE TABLE IF NOT EXISTS managers ( id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL UNIQUE, password_hash VARCHAR(64) NOT NULL )' )
+    await dbPool.query( `CREATE TABLE IF NOT EXISTS managers (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        password_hash VARCHAR(64) NOT NULL 
+        )`)
     
     const manager = new UserManager(
         req.body.name,
@@ -146,7 +185,15 @@ router.post("/cadastrarCli", async (req, res) => {
     let newClientRes = { message: "", email: "", name: "" };
     try{
 
-        await dbPool.query('CREATE TABLE IF NOT EXISTS clients ( id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, cpf VARCHAR(11) NOT NULL UNIQUE, email VARCHAR(255) NOT NULL UNIQUE, password_hash VARCHAR(64) NOT NULL, rg VARCHAR(7), phone_number VARCHAR(14), address TEXT )');
+        await dbPool.query(`CREATE TABLE IF NOT EXISTS clients (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            cpf VARCHAR(11) NOT NULL UNIQUE,
+            email VARCHAR(255) NOT NULL UNIQUE,
+            password_hash VARCHAR(64) NOT NULL,
+            rg VARCHAR(7), phone_number VARCHAR(14),
+            address TEXT 
+            )`);
 
         const registration = new UserClient(
             req.body.name,
@@ -168,8 +215,22 @@ router.post("/cadastrarCli", async (req, res) => {
             registration.password = sha256(`${registration.password}`)
 
             await dbPool.query(
-                'INSERT INTO clients (name, cpf, email, password_hash, rg, phone_number, address) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-                [registration.name, registration.cpf, registration.email, registration.password, registration.rg, registration.phone, registration.address]    
+                `INSERT INTO clients (
+                name,
+                cpf,
+                email,
+                password_hash,
+                rg, phone_number,
+                address) 
+                VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+                [registration.name,
+                    registration.cpf,
+                    registration.email,
+                    registration.password,
+                    registration.rg,
+                    registration.phone,
+                    registration.address
+                ]    
             )
 
             newClientRes.email = registration.email;
