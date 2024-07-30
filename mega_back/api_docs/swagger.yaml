@@ -8,38 +8,76 @@ servers:
   description: SwaggerHub API Auto Mocking
 - url: http://localhost:3001
 paths:
-  /adicionarProduto:
-    post: #testando integração com o swaggerhub
-      summary: Saves a product on database
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/adicionarProduto_body'
-        required: true
-      responses:
-        "201":
-          description: product has been added
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_201'
-        "400":
-          description: "some invalid data, invalid sintax etc"
-        "500":
-          description: server internal error
+  /verMedicamento:
+
   /listarMedicamentos:
     get:
       summary: Returs a list of medicines
       responses:
-        "200":
+        '200':
           description: products list sent
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200'
-        "500":
+                type: object
+                properties:
+                  message:
+                    type: string
+                  medicineList:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        medName:
+                          type: string
+                        medDescription:
+                          type: string
+                        medUnitPrice:
+                          type: number
+                        needRecipe:
+                          type: boolean
+      '500':
+         description: server internal error
+
+
+  /cadastrarMedicamento:
+    post:
+      summary: Saves a product on database
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                medName:
+                  type: string
+                medDescription:
+                  type: string
+                medUnitPrice:
+                  type: number
+                amountOnStock:
+                  type: integer
+                managerWhoAdded:
+                  type: string
+                needRecipe:
+                  type: boolean
+      responses:
+        '201':
+          description: product has been added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: some invalid data, invalid sintax etc
+        '500':
           description: server internal error
+
+
   /cadastrarCli:
     post:
       summary: Validate data and register a new client account
@@ -70,6 +108,7 @@ paths:
                 $ref: '#/components/schemas/inline_response_201_1'
         "500":
           description: server internal error
+
   /cadastrarAdm:
     post:
       summary: Validate data and register a manager
