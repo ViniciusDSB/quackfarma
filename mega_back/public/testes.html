@@ -90,13 +90,16 @@
             <button type="submit">Logar</button>
         </form>
 
-        <form action="/adicionarProduto" method="post">
+        <form action="/cadastrarMedicamento" method="post">
             <h2>Adicionar ao estoque</h2>
             <input type="text" name="medName" placeholder="nome">
+            <input type="number" name="medCode" placeholder="Codigo do mecidamento">
+            <input type="text" name="medCategory" placeholder="Categoria">
             <input type="text" name="medDescription" placeholder="Descrição">
             <input type="number" name="medUnitPrice" step="0.01" placeholder="Preço da unidade">
             <input type="number" name="amountOnStock" placeholder="Qtd. em estoque">
             <input type="number" name="managerWhoAdded" placeholder="Quem adicionou" value=1>
+            <input type="text" name="imagePath" value="localhost:port/medicineImages/image.png">
             <input type="checkbox" name="needsRecipe"id="needRecipeCheckBox">
             <label for="needRecipeCheckBox">Precisa de receita?</label>
             <button type="submit">Salvar</button>
@@ -109,7 +112,7 @@
 
         <form action="/verMedicamento" method="get">
             <h2>Buscar Medicamento</h2>
-            <input type="text" name="name" placeholder="nome">
+            <input type="number" name="code" placeholder="meidicineCode">
             <button type="submit">Buscar</button>
         </form>
     </div>

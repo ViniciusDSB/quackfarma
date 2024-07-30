@@ -1,13 +1,16 @@
 const DEFAULT_MESSAGE = "OK";
 
 class Medicine{
-    constructor(name, description, unitPrice, stockAmount, whoAdded, needsRecipe){
-        this.name = name;
-        this.description = description;
-        this.unitPrice = unitPrice;
-        this.stockAmount = stockAmount;
-        this.whoAdded = whoAdded;
-        this.needsRecipe = needsRecipe;
+    constructor(medName, medCode, medCategory, medDescription, medUnitPrice, amountOnStock, managerWhoAdded, imagePath, needsRecipe){
+        this.name = medName 
+        this.code = medCode
+        this.category = medCategory
+        this.description = medDescription
+        this.unitPrice = medUnitPrice
+        this.amountOnStock = amountOnStock
+        this.managerWhoAdded = managerWhoAdded
+        this.imagePath = imagePath
+        this.needsRecipe = needsRecipe
     }
 
     validadeData(){ 

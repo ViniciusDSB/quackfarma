@@ -5,8 +5,8 @@ const cors = require("cors");
 
 const {app, express} = require('./expressApp');
 
-const { setMedicines } = require('./usefulScripts/addMedicines');
-setMedicines();
+const { setMedications } = require('./usefulScripts/addMedicines');
+setMedications();
 
 const basicRoutes = require("./routes");
 app.use("/", basicRoutes);
