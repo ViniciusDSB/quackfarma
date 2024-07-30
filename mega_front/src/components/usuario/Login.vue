@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" max-width="600" color="light-green-lighten-4">
+  <v-dialog v-model="dialog" max-width="600" color="light-green-lighten-4" persistent>
     <v-card>
       <v-card-title>
         <v-btn

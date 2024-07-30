@@ -24,12 +24,14 @@ form para cadastar cliente e um para adm
     Se algum problema ocorrer então loginRes.status != "OK", isto é, status será uma mensagem indicando o erro
 
 /cadastrarCli, recebe os campos: name, cpf, email, password, passwordRepeat, rg, address, phone;
-    newClientRes = { email: "", name: "", status: "OK/outros", exists: true/false }
+    newClientRes = { email: "", name: "", status: "OK/outros",  alredyExists: true/false }
     Como na rota anterior: se tudo tiver dado certo retorna status = "OK" e caso contrario
     status = "mensagem de erro"
 
 /cadastrarAdm, recebe os campos: name,email, password, passwordRepeat; (não da pra fazer login com ADM agora, só cadastar)
-    newManagerRes = { email: "", name: "", status: "OK/outros", exists: true/false }
+    newManagerRes = { email: "", name: "", status: "OK/outros",  alredyExists: true/false }
     Mesmo esquema das rotas anteriores: se tudo tiver dado certo retorna status = "OK", caso contrario
     status = "mensagem de erro"
 
+Nos responses vão ser adicionadas mais propriedades coforme necessidade
+A rota de logar com ADM aparecera assim que tiver página de ADM, já estamos montando a rota
