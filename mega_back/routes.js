@@ -100,7 +100,7 @@ router.get('/verMedicamento', async (req, res) => {
         if(!medicine) {
             return res.status(400).send('Nome do medicamento é obrigatório.');
         }
-        const busca = await dbPool.query('SELECT * FROM medicines WHERE name = $1', [medicine]);
+        const busca = await dbPool.query('SELECT name, description, unit_price, needs_recipe FROM medicines WHERE name = $1', [medicine]);
 
         if(busca.rows.length > 0) {
             const remedio = busca.rows[0];
