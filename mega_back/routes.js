@@ -21,8 +21,11 @@ router.post("/adicionarProduto", async (req, res) => {
     try{
         await dbPool.query(`CREATE TABLE IF NOT EXISTS medicines(
             id SERIAL PRIMARY KEY,
+            cod INTEGER NOT NULL UNIQUE,
+            category VARCHAR(32) NOT NULL,
             name VARCHAR(255) NOT NULL,
             description TEXT NOT NULL,
+            image TEXT NOT NULL,
             needs_recipe BOOLEAN NOT NULL,
             unit_price NUMERIC(10, 2) NOT NULL,
             on_stock INTEGER NOT NULL,
@@ -91,6 +94,25 @@ router.get('/listarMedicamentos', async (req, res) => {
     }
 })
 
+router.get('/verMedicamento', async (req, res) => {
+    try{
+        const medicine = req.query.name;
+        if(!medicine) {
+            return res.status(400).send('Nome do medicamento é obrigatório.');
+        }
+        const busca = await dbPool.query('SELECT * FROM medicines WHERE name = $1', [medicine]);
+
+        if(busca.rows.length > 0) {
+            const remedio = busca.rows[0];
+            res.json(remedio);
+        }else{
+            res.status(404).send('Medicamento não encontrado.');
+        }
+    }catch(err){
+        console.error('Erro na rota /verMedicamento', err);
+        res.status(SERVER_ERR).send('Erro ao listar produto. Verifique o log.');
+    }
+})
 
 router.post('/fazerLogin', async (req, res) => {
     let loginRes= { message: "", email: "", name: "" };
