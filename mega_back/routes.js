@@ -8,6 +8,7 @@ const path = require('path');
 const OK = 200;
 const CREATED = 201;
 const ACCEPTED = 202;
+const ACCEPTED_ADM = 209;
 const BAD_REQUEST = 400;
 const UNAUTHORIZED = 401;
 const NOT_FOUND = 404;
@@ -108,47 +109,56 @@ router.post("/cadastrarMedicamento", async (req, res) => {
         }else{
             res.status(BAD_REQUEST).json( {'message': medicine.status} );
         }
-
     }catch(err){
-        console.error('Erro na rota /adicionarProduto', err);
-        res.status(SERVER_ERR).send('Erro ao adicionar produto. Verifique o log.');
+        console.error('Erro na rota /cadastrarMedicamento', err);
+        res.status(SERVER_ERR).send('Erro ao adicionar medicamento. Verifique o log.');
     }
 })
 
 
 router.post('/fazerLogin', async (req, res) => {
-    let loginRes= { message: "", email: "", name: "", cpf:"", rg: "", address: "", phone_number: "", is_adm: false};
 try{
     const login = new Login( req.body.email, req.body.password );
     login.validateData(); //apenas para validacao de formato, regex etc
 
     if(login.status === DEFAULT_MESSAGE){ 
         if( (await dbPool.query('SELECT EXISTS (SELECT 1 FROM clients WHERE email = $1)', [login.email])).rows[0].exists ){
-            loginRes.email = login.email;
+            
             const queryResult = await dbPool.query('SELECT name, cpf, rg, phone_number, address, password_hash FROM clients WHERE email = $1', [login.email]);
 
             if(sha256(`${login.password}`) == queryResult.rows[0].password_hash){//se senha esta correta
-                loginRes.name = queryResult.rows[0].name;
-                loginRes.cpf = queryResult.rows[0].cpf
-                loginRes.rg = queryResult.rows[0].rg
-                loginRes.phone_number = queryResult.rows[0].phone_number
-                loginRes.address = queryResult.rows[0].address
-                loginRes.is_adm = false;
-                loginRes.message = DEFAULT_MESSAGE;
-                res.status(ACCEPTED).json( loginRes );
-            }else{
-                loginRes.message = "Senha incorreta!";
-                res.status(UNAUTHORIZED).json( loginRes );
-            }
+                res.status(ACCEPTED).json( 
+                    {   message: DEFAULT_MESSAGE, 
+                        email: login.email, 
+                        name: queryResult.rows[0].name, 
+                        cpf: queryResult.rows[0].cpf, 
+                        rg: queryResult.rows[0].rg, 
+                        address: queryResult.rows[0].address, 
+                        phone_number: queryResult.rows[0].phone_number, 
+                        is_adm: false}
+                );
+            }else{ res.status(UNAUTHORIZED).json( {message: "Senha incorreta!" } ); }
 
+        }else if((await dbPool.query('SELECT EXISTS (SELECT 1 FROM managers WHERE email = $1)', [login.email])).rows[0].exists){
+            const queryResult = await dbPool.query('SELECT name, password_hash FROM managers WHERE email = $1', [login.email]);
+
+            if(sha256(`${login.password}`) == queryResult.rows[0].password_hash){//se senha esta correta
+                res.status(ACCEPTED_ADM).json( 
+                    {   message: DEFAULT_MESSAGE, 
+                        email: login.email, 
+                        name: queryResult.rows[0].name,
+                        is_adm: true
+                    }
+                );
+            }else{ res.status(UNAUTHORIZED).json( {message: "Senha incorreta!" } ); }
         }else{
-            loginRes.message = "Usuário não existe!";
-            res.status(UNAUTHORIZED).json( loginRes);
+            res.status(NOT_FOUND).json( {message: "Usuário não existe!" } );
         }
+
     }else{
-        loginRes.message = login.status;
-        res.status(BAD_REQUEST).json( loginRes );
+        res.status(BAD_REQUEST).json( {message: login.status } );
     }
+
 }catch(err){
     console.error('Erro na rota /fazerLogin', err);
     res.status(SERVER_ERR).send('Erro fazer login. Veirfique o log.');
@@ -157,7 +167,6 @@ try{
 })
 
 router.post('/cadastrarAdm', async (req, res) => {
-    let newManagerRes = { message: "", email: "", name: "" }
 try{
     await dbPool.query( `CREATE TABLE IF NOT EXISTS managers (
         id SERIAL PRIMARY KEY,
@@ -175,41 +184,36 @@ try{
     manager.validateData();
 
     if(manager.status != DEFAULT_MESSAGE){
-        newManagerRes.message = manager.status;
-        res.status(BAD_REQUEST).json( newManagerRes );
+        res.status(BAD_REQUEST).json( { message: manager.status } );
     }else{
         manager.password = sha256(`${manager.password}`);
         await dbPool.query(
             'INSERT INTO managers (name, email, password_hash) VALUES ($1, $2, $3)', 
             [manager.name, manager.email, manager.password]
         )
-
-        newManagerRes.email = manager.email;
-        newManagerRes.name = manager.name;
-        newManagerRes.message = DEFAULT_MESSAGE;
-        res.status(CREATED).json( newManagerRes );
+        res.status(CREATED).json( { message: DEFAULT_MESSAGE } );
     }
 
 }catch(err){
 
     if(err.code === '23505'){
         const match = err.detail.match(/Key \(([^)]+)\)=\(([^)]+)\)/);
+        const key = "";
+        const value= "";
         if (match) {
-            const key = match[1];
-            const value = match[2];
-            newManagerRes.message = `${key} ${value} já está cadastrado.`;
+            key = match[1];
+            value = match[2];
         }
-        res.status(UNAUTHORIZED).json( newManagerRes );
+        res.status(UNAUTHORIZED).json( { message: `${key} ${value} já está cadastrado.` } );
     } 
     else{
         console.error('Erro na rota /cadastrarCli', err);
-        res.status(SERVER_ERR).send('Erro ao cadastrar administrador. Veirfique o log.');
+        res.status(SERVER_ERR).send('Erro ao cadastrar cliente. Veirfique o log.');
     }
 }
 })
 
 router.post("/cadastrarCli", async (req, res) => {
-    let newClientRes = { message: "", email: "", name: "" };
     try{
 
         await dbPool.query(`CREATE TABLE IF NOT EXISTS clients (
@@ -236,10 +240,9 @@ router.post("/cadastrarCli", async (req, res) => {
 
         
         if(registration.status != DEFAULT_MESSAGE){//se deu erro no formato dos dados
-            newClientRes.message = registration.status
-            res.status(BAD_REQUEST).json( newClientRes );
+            res.status(BAD_REQUEST).json( { message: registration.status } );
         }else{
-            registration.password = sha256(`${registration.password}`)
+            registration.password = sha256(`${registration.password}`);
 
             await dbPool.query(
                 `INSERT INTO clients (
@@ -250,7 +253,7 @@ router.post("/cadastrarCli", async (req, res) => {
                 rg, phone_number,
                 address) 
                 VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-                [registration.name,
+                [   registration.name,
                     registration.cpf,
                     registration.email,
                     registration.password,
@@ -259,23 +262,20 @@ router.post("/cadastrarCli", async (req, res) => {
                     registration.address
                 ]    
             )
-
-            newClientRes.email = registration.email;
-            newClientRes.name = registration.name;
-            newClientRes.message = DEFAULT_MESSAGE;
-            res.status(CREATED).json( newClientRes );
+            res.status(CREATED).json( { message: DEFAULT_MESSAGE } );
 
         }
     }catch(err){
 
         if(err.code === '23505'){
             const match = err.detail.match(/Key \(([^)]+)\)=\(([^)]+)\)/);
+            const key = "";
+            const value= "";
             if (match) {
-                const key = match[1];
-                const value = match[2];
-                newClientRes.message = `${key} ${value} já está cadastrado.`;
+                key = match[1];
+                value = match[2];
             }
-            res.status(UNAUTHORIZED).json( newClientRes );
+            res.status(UNAUTHORIZED).json( { message: `${key} ${value} já está cadastrado.` } );
         } 
         else{
             console.error('Erro na rota /cadastrarCli', err);
