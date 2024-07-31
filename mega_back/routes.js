@@ -29,7 +29,7 @@ router.get('/verMedicamento', async (req, res) => {
                 res.status(NOT_FOUND).send({'message':'Medicamento não encontrado!'});
             }
         }else{
-            res.status(BAD_REQUEST).json( { 'message': 'Requisição inválida!'});
+            res.status(BAD_REQUEST).json( { 'message': 'Erro ao processar requisição!'});
         }
         
     }catch(err){
@@ -54,19 +54,8 @@ router.get('/listarMedicamentos', async (req, res) => {
 
     }catch(err){
 
-        if(err.code === '23505'){
-            const match = err.detail.match(/Key \(([^)]+)\)=\(([^)]+)\)/);
-            if (match) {
-                const key = match[1];
-                const value = match[2];
-                message = `${key} ${value} já está cadastrado.`;
-            }
-            res.status(UNAUTHORIZED).json( {'message': message} );
-        } 
-        else{
-            console.error('Erro na rota /listarMedicamentos', err);
-            res.status(SERVER_ERR).send('Erro ao encontrar produtos. Verifique o log.');
-        }
+        console.error('Erro na rota /listarMedicamentos', err);
+        res.status(SERVER_ERR).send('Erro ao encontrar produtos. Verifique o log.');
         
     }
 })

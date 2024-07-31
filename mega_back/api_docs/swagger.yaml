@@ -9,10 +9,49 @@ servers:
 - url: http://localhost:3001
 paths:
   /verMedicamento:
+    get:
+      summary: Returns the information about a single product
+      responses:
+        '200':
+          description: products information sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  medicine_data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        code:
+                          type: string
+                        category:
+                          type: string
+                        description:
+                          type: string
+                        unit_price:
+                          type: number
+                        needs_recipe:
+                          type: boolean
+                        image_path:
+                          type: string
+                        on_stock:
+                          type: string
+        '400':
+          description: Error processing request
+        '404':
+          description: Product not found
+        '500':
+          description: server internal error
 
   /listarMedicamentos:
     get:
-      summary: Returs a list of medicines
+      summary: Returs a list of products and it's basic information.
       responses:
         '200':
           description: products list sent
@@ -28,14 +67,18 @@ paths:
                     items:
                       type: object
                       properties:
-                        medName:
+                        name:
                           type: string
-                        medDescription:
+                        code:
                           type: string
-                        medUnitPrice:
+                        category:
+                          type: string
+                        description:
+                          type: string
+                        unit_price:
                           type: number
-                        needRecipe:
-                          type: boolean
+                        image_path:
+                          type: string
       '500':
          description: server internal error
 
