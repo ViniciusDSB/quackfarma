@@ -129,6 +129,15 @@ paths:
                 properties:
                   message:
                     type: string
+        '401':
+          description: Unauthorized data, alredy exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
         '500':
           description: server internal error
 
@@ -154,11 +163,11 @@ paths:
                 passwordRepeat:
                   type: string
                 rg:
-                  type: integer
+                  type: string
                 address:
                   type: string
                 phone:
-                  type: integer
+                  type: string
       responses:
         "201":
           description: client registration created

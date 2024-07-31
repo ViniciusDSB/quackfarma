@@ -22,16 +22,17 @@ async function setGodUser(){
 }
 
 async function setClientTable(){
-  await dbPool.query(`CREATE TABLE IF NOT EXISTS clients (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    cpf VARCHAR(11) NOT NULL UNIQUE,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password_hash VARCHAR(64) NOT NULL,
-    rg VARCHAR(7),
-    phone_number VARCHAR(14),
-    address TEXT 
-    )`);
+  await dbPool.query('DROP TABLE IF EXISTS clients');
+  await dbPool.query(`CREATE TABLE IF NOT EXISTS client (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            cpf VARCHAR(11) NOT NULL UNIQUE,
+            email VARCHAR(255) NOT NULL UNIQUE,
+            password_hash VARCHAR(64) NOT NULL,
+            rg VARCHAR(7),
+            phone_number VARCHAR(14),
+            address TEXT 
+            )`);
     console.log("Client table ok");
 }
 
