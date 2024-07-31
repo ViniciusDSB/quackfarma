@@ -12,11 +12,11 @@ async function setGodUser(){
   const isDataSaved = (await dbPool.query('SELECT EXISTS (SELECT 1 FROM managers WHERE email = $1)', ['goduser@gmail.com'])).rows[0].exists
   if(!isDataSaved){
     await dbPool.query(`INSERT INTO managers (name, email, password_hash) VALUES ($1, $2, $3)`,
-      ['goduser', 'goduser@gmail.com', sha256(`deus`)]
+      ['goduser', 'goduser@gmail.com', sha256(`A.b1234`)]
     )
-    console.log("God-user set as email: goduser@gamil.com; password: deus");
+    console.log("God-user set as email: goduser@gamil.com; password: A.b1234");
   }else{
-    console.log("God-user ok: email= goduser@gamil.com; password= deus");
+    console.log("God-user ok: email= goduser@gamil.com; password= A.b1234");
   }
   
 }
