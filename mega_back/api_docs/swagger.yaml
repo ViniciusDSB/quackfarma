@@ -139,6 +139,7 @@ paths:
                 $ref: '#/components/schemas/inline_response_201_1'
         "500":
           description: server internal error
+  
   /fazerLogin:
     post:
       summary: Checks the credentials and respond with user data if success

@@ -128,7 +128,7 @@ router.post("/cadastrarMedicamento", async (req, res) => {
 
 
 router.post('/fazerLogin', async (req, res) => {
-    let loginRes= { message: "", email: "", name: "" };
+    let loginRes= { message: "", email: "", name: "", cpf:"", rg: "", address: "", phone_number: "", is_adm: false};
 try{
     const login = new Login( req.body.email, req.body.password );
     login.validateData(); //apenas para validacao de formato, regex etc
@@ -136,10 +136,15 @@ try{
     if(login.status === DEFAULT_MESSAGE){ 
         if( (await dbPool.query('SELECT EXISTS (SELECT 1 FROM clients WHERE email = $1)', [login.email])).rows[0].exists ){
             loginRes.email = login.email;
-            const queryResult = await dbPool.query('SELECT name, password_hash FROM clients WHERE email = $1', [login.email]);
+            const queryResult = await dbPool.query('SELECT name, cpf, rg, phone_number, address, password_hash FROM clients WHERE email = $1', [login.email]);
 
             if(sha256(`${login.password}`) == queryResult.rows[0].password_hash){//se senha esta correta
                 loginRes.name = queryResult.rows[0].name;
+                loginRes.cpf = queryResult.rows[0].cpf
+                loginRes.rg = queryResult.rows[0].rg
+                loginRes.phone_number = queryResult.rows[0].phone_number
+                loginRes.address = queryResult.rows[0].address
+                loginRes.is_adm = false;
                 loginRes.message = DEFAULT_MESSAGE;
                 res.status(ACCEPTED).json( loginRes );
             }else{
