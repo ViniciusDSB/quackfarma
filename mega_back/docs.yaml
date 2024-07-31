@@ -3,10 +3,80 @@ info:
   version: '1.0'
   title: mega_back endpoints documentation
   description: routes, requests and responses of our server
-paths: 
+paths:
+  /verMedicamento:
+
+  /listarMedicamentos:
+    get:
+      summary: Returs a list of medicines
+      responses:
+        '200':
+          description: products list sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  medicineList:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        medName:
+                          type: string
+                        medDescription:
+                          type: string
+                        medUnitPrice:
+                          type: number
+                        needRecipe:
+                          type: boolean
+      '500':
+         description: server internal error
+
+
+  /cadastrarMedicamento:
+    post:
+      summary: Saves a product on database
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                medName:
+                  type: string
+                medDescription:
+                  type: string
+                medUnitPrice:
+                  type: number
+                amountOnStock:
+                  type: integer
+                managerWhoAdded:
+                  type: string
+                needRecipe:
+                  type: boolean
+      responses:
+        '201':
+          description: product has been added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: some invalid data, invalid sintax etc
+        '500':
+          description: server internal error
+  
+
   /cadastrarCli:
     post:
-      summary: Validate data and save a new client on database.
+      summary: Validate data and register a new client account
       requestBody:
         required: true
         content:
@@ -71,11 +141,11 @@ paths:
                   name:
                     type: string
         '500':
-          description: client registration created
+          description: server internal error
         
   /cadastrarAdm:
     post:
-      summary: Validade data and savee a new cliente on database.
+      summary: Validate data and register a manager
       requestBody:
         required: true
         content:
@@ -93,7 +163,7 @@ paths:
                   type: string
       responses:
         '201':
-          description: client registration created
+          description: manager registration created
           content:
             application/json:
               schema:
@@ -132,11 +202,11 @@ paths:
                   name:
                     type: string
         '500':
-          description: client registration created
+          description: server internal error
   
   /fazerLogin:
     post:
-      summary: Receive user data, checks the credentials and responds with a json.
+      summary: Checks the credentials and respond with user data if success
       requestBody:
         required: true
         content:
@@ -189,11 +259,10 @@ paths:
                   name:
                     type: string
         '500':
-          description: client registration created
+          description: server internal error
 
 servers:
-  url: http://localhost:3001
-    
   # Added by API Auto Mocking Plugin
-  description: SwaggerHub API Auto Mocking
-  url: https://virtserver.swaggerhub.com/VINIDSB580/Mega_back/1.0
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/VINIDSB580/mega_back/1.0
+  - url: http://localhost:3001

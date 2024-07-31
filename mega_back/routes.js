@@ -5,18 +5,125 @@ const path = require('path');
 
 
 //http codes 
-const CREATED = 201
-const ACCEPTED = 202
-const BAD_REQUEST = 400
-const UNAUTHORIZED = 401
-const SERVER_ERR = 500
+const OK = 200;
+const CREATED = 201;
+const ACCEPTED = 202;
+const BAD_REQUEST = 400;
+const UNAUTHORIZED = 401;
+const NOT_FOUND = 404;
+const SERVER_ERR = 500;
 
 //database, pg pool (located at ./dbConnection.js)
 const dbPool = require('./dbConnection');
-const { Login, User , UserManager, UserClient , DEFAULT_MESSAGE} = require("./myClasses");
+const { Login, User , UserManager, UserClient , Medicine, DEFAULT_MESSAGE} = require("./myClasses");
 
-router.get('/vitrine', async (req, res) => {
+router.get('/verMedicamento', async (req, res) => {
+    try{
+        const medicine_code = req.query.code;
+        if(medicine_code) {
+            const medicine_data = await dbPool.query('SELECT name, code, category, description, unit_price, needs_recipe, image_path, on_stock FROM medications WHERE code= $1', [medicine_code]);
 
+            if(medicine_data.rows.length > 0) {
+                res.status(OK).json({'message': DEFAULT_MESSAGE, 'medicineData': medicine_data .rows[0]});
+            }else{
+                res.status(NOT_FOUND).send({'message':'Medicamento não encontrado!'});
+            }
+        }else{
+            res.status(BAD_REQUEST).json( { 'message': 'Requisição inválida!'});
+        }
+        
+    }catch(err){
+        console.error('Erro na rota /verMedicamento', err);
+        res.status(SERVER_ERR).send('Erro ao mostrar produto. Verifique o log.');
+    }
+})
+
+router.get('/listarMedicamentos', async (req, res) => {
+    try{
+
+        const medicamentos = await dbPool.query(`SELECT 
+            name,
+            code,
+            category,
+            description,
+            unit_price,
+            image_path
+            FROM medications`);
+            
+        res.status(OK).json( {'message': DEFAULT_MESSAGE, 'medicineList': medicamentos.rows} );
+
+    }catch(err){
+
+        if(err.code === '23505'){
+            const match = err.detail.match(/Key \(([^)]+)\)=\(([^)]+)\)/);
+            if (match) {
+                const key = match[1];
+                const value = match[2];
+                message = `${key} ${value} já está cadastrado.`;
+            }
+            res.status(UNAUTHORIZED).json( {'message': message} );
+        } 
+        else{
+            console.error('Erro na rota /listarMedicamentos', err);
+            res.status(SERVER_ERR).send('Erro ao encontrar produtos. Verifique o log.');
+        }
+        
+    }
+})
+
+router.post("/cadastrarMedicamento", async (req, res) => {
+    try{
+            
+        const needsRecipe = req.body.needsRecipe? true : false;
+        const medicine = new Medicine(
+            req.body.medName,
+            req.body.medCode,
+            req.body.medCategory,
+            req.body.medDescription,
+            req.body.medUnitPrice,
+            req.body.amountOnStock,
+            req.body.managerWhoAdded,
+            req.body.imagePath,
+            needsRecipe
+        );
+        medicine.validadeData();
+    
+        if(medicine.status === DEFAULT_MESSAGE){
+
+            await dbPool.query(`INSERT INTO medications (
+                name,
+                code,
+                category,
+                description, 
+                needs_recipe, 
+                unit_price, 
+                on_stock, 
+                manager,
+                image_path,
+                created_at,
+                last_update)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+                [medicine.name,
+                    medicine.code,
+                    medicine.category,
+                    medicine.description,
+                    medicine.needsRecipe,
+                    medicine.unitPrice,
+                    medicine.amountOnStock,
+                    medicine.managerWhoAdded,
+                    medicine.imagePath,
+                    new Date(), new Date()
+                ]);
+                   
+            res.status(OK).json( {'message': 'Medicamento adicionado ao estoque!'} );
+        }else{
+            res.status(BAD_REQUEST).json( {'message': medicine.status} );
+        }
+
+    }catch(err){
+        console.error('Erro na rota /adicionarProduto', err);
+        res.status(SERVER_ERR).send('Erro ao adicionar produto. Verifique o log.');
+    }
 })
 
 
@@ -26,12 +133,7 @@ try{
     const login = new Login( req.body.email, req.body.password );
     login.validateData(); //apenas para validacao de formato, regex etc
 
-    if(login.status != DEFAULT_MESSAGE){ //se tiver prroblma no formato dos dados de login
-        loginRes.message = login.status;
-        res.status(BAD_REQUEST).json( loginRes );
-    }else{
-
-        //se existe
+    if(login.status === DEFAULT_MESSAGE){ 
         if( (await dbPool.query('SELECT EXISTS (SELECT 1 FROM clients WHERE email = $1)', [login.email])).rows[0].exists ){
             loginRes.email = login.email;
             const queryResult = await dbPool.query('SELECT name, password_hash FROM clients WHERE email = $1', [login.email]);
@@ -49,6 +151,9 @@ try{
             loginRes.message = "Usuário não existe!";
             res.status(UNAUTHORIZED).json( loginRes);
         }
+    }else{
+        loginRes.message = login.status;
+        res.status(BAD_REQUEST).json( loginRes );
     }
 }catch(err){
     console.error('Erro na rota /fazerLogin', err);
@@ -60,7 +165,12 @@ try{
 router.post('/cadastrarAdm', async (req, res) => {
     let newManagerRes = { message: "", email: "", name: "" }
 try{
-    await dbPool.query( ' CREATE TABLE IF NOT EXISTS managers ( id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL UNIQUE, password_hash VARCHAR(64) NOT NULL )' )
+    await dbPool.query( `CREATE TABLE IF NOT EXISTS managers (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        password_hash VARCHAR(64) NOT NULL 
+        )`)
     
     const manager = new UserManager(
         req.body.name,
@@ -99,7 +209,7 @@ try{
     } 
     else{
         console.error('Erro na rota /cadastrarCli', err);
-        res.status(SERVER_ERR).send('Erro ao cadastrar cliente. Veirfique o log.');
+        res.status(SERVER_ERR).send('Erro ao cadastrar administrador. Veirfique o log.');
     }
 }
 })
@@ -108,7 +218,15 @@ router.post("/cadastrarCli", async (req, res) => {
     let newClientRes = { message: "", email: "", name: "" };
     try{
 
-        await dbPool.query('CREATE TABLE IF NOT EXISTS clients ( id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, cpf VARCHAR(11) NOT NULL UNIQUE, email VARCHAR(255) NOT NULL UNIQUE, password_hash VARCHAR(64) NOT NULL, rg VARCHAR(7), phone_number VARCHAR(14), address TEXT )');
+        await dbPool.query(`CREATE TABLE IF NOT EXISTS clients (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            cpf VARCHAR(11) NOT NULL UNIQUE,
+            email VARCHAR(255) NOT NULL UNIQUE,
+            password_hash VARCHAR(64) NOT NULL,
+            rg VARCHAR(7), phone_number VARCHAR(14),
+            address TEXT 
+            )`);
 
         const registration = new UserClient(
             req.body.name,
@@ -130,8 +248,22 @@ router.post("/cadastrarCli", async (req, res) => {
             registration.password = sha256(`${registration.password}`)
 
             await dbPool.query(
-                'INSERT INTO clients (name, cpf, email, password_hash, rg, phone_number, address) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-                [registration.name, registration.cpf, registration.email, registration.password, registration.rg, registration.phone, registration.address]    
+                `INSERT INTO clients (
+                name,
+                cpf,
+                email,
+                password_hash,
+                rg, phone_number,
+                address) 
+                VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+                [registration.name,
+                    registration.cpf,
+                    registration.email,
+                    registration.password,
+                    registration.rg,
+                    registration.phone,
+                    registration.address
+                ]    
             )
 
             newClientRes.email = registration.email;

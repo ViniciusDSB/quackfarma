@@ -1,5 +1,23 @@
 const DEFAULT_MESSAGE = "OK";
 
+class Medicine{
+    constructor(medName, medCode, medCategory, medDescription, medUnitPrice, amountOnStock, managerWhoAdded, imagePath, needsRecipe){
+        this.name = medName 
+        this.code = medCode
+        this.category = medCategory
+        this.description = medDescription
+        this.unitPrice = medUnitPrice
+        this.amountOnStock = amountOnStock
+        this.managerWhoAdded = managerWhoAdded
+        this.imagePath = imagePath
+        this.needsRecipe = needsRecipe
+    }
+
+    validadeData(){ 
+        this.status = DEFAULT_MESSAGE;
+    }
+}
+
 class Login{
     constructor(loginEmail, loginPassword){
         this.email = loginEmail;
@@ -91,7 +109,6 @@ class User{
         }
     }
 }
-
 
 class UserManager extends User{
     constructor(name, email, password, passwordRepeat){
@@ -200,4 +217,4 @@ function VerificadorCpf(cpf) {
     return true;
 }
 
-module.exports = { Login, User, UserManager, UserClient, DEFAULT_MESSAGE};
+module.exports = { Login, User, UserManager, UserClient, Medicine, DEFAULT_MESSAGE};
