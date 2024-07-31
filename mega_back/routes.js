@@ -110,8 +110,20 @@ router.post("/cadastrarMedicamento", async (req, res) => {
             res.status(BAD_REQUEST).json( {'message': medicine.status} );
         }
     }catch(err){
-        console.error('Erro na rota /cadastrarMedicamento', err);
-        res.status(SERVER_ERR).send('Erro ao adicionar medicamento. Verifique o log.');
+        if(err.code === '23505'){
+            const match = err.detail.match(/Key \(([^)]+)\)=\(([^)]+)\)/);
+            const key = "";
+            const value= "";
+            if (match) {
+                key = match[1];
+                value = match[2];
+            }
+            res.status(UNAUTHORIZED).json( { message: `${key} ${value} já está cadastrado.` } );
+        } 
+        else{
+            console.error('Erro na rota /cadastrarMedicamento', err);
+            res.status(SERVER_ERR).send('Erro ao cadastrar medicamento. Veirfique o log.');
+        }
     }
 })
 
@@ -216,13 +228,14 @@ try{
 router.post("/cadastrarCli", async (req, res) => {
     try{
 
-        await dbPool.query(`CREATE TABLE IF NOT EXISTS clients (
+        await dbPool.query(`CREATE TABLE IF NOT EXISTS client (
             id SERIAL PRIMARY KEY,
             name VARCHAR(255) NOT NULL,
             cpf VARCHAR(11) NOT NULL UNIQUE,
             email VARCHAR(255) NOT NULL UNIQUE,
             password_hash VARCHAR(64) NOT NULL,
-            rg VARCHAR(7), phone_number VARCHAR(14),
+            rg VARCHAR(7),
+            phone_number VARCHAR(14),
             address TEXT 
             )`);
 
@@ -245,12 +258,13 @@ router.post("/cadastrarCli", async (req, res) => {
             registration.password = sha256(`${registration.password}`);
 
             await dbPool.query(
-                `INSERT INTO clients (
+                `INSERT INTO client (
                 name,
                 cpf,
                 email,
                 password_hash,
-                rg, phone_number,
+                rg,
+                phone_number,
                 address) 
                 VALUES ($1, $2, $3, $4, $5, $6, $7)`,
                 [   registration.name,
