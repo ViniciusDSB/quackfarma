@@ -9,12 +9,14 @@ async function setGodUser(){
     password_hash VARCHAR(64) NOT NULL 
     )`)
     
-  const exists = (await dbPool.query(`SELECT EXISTS (SELECT 1 FROM clients WHERE email = $1)`, ['goduser@gmail.com'])).rows[0].exists;
-  if(!exists){
-    await dbPool.query(`INSERT INTO managers name, email, password_hash`,
-      ['goduser', 'goduser@gmail.com', sha256(`${manager.password}`)]
+  const isDataSaved = (await dbPool.query('SELECT EXISTS (SELECT 1 FROM managers WHERE email = $1)', ['goduser@gmail.com'])).rows[0].exists
+  if(!isDataSaved){
+    await dbPool.query(`INSERT INTO managers (name, email, password_hash) VALUES ($1, $2, $3)`,
+      ['goduser', 'goduser@gmail.com', sha256(`deus`)]
     )
-    console.log("god ok");
+    console.log("God-user set as email: goduser@gamil.com; password: deus");
+  }else{
+    console.log("God-user ok: email= goduser@gamil.com; password= deus");
   }
   
 }
@@ -134,8 +136,11 @@ async function setMedications(){
               [med.name, med.code, med.category, med.description, med.needs_recipe, med.unit_price, med.on_stock, managerId, med.image_path, med.created_at, med.last_update]
             );
         }
+        console.log("Sample products ok");
+    }else{
+      console.log("Products ok");
     }
-    console.log("Products ok");
+    
 }
 
 module.exports = { setGodUser , setClientTable, setMedications };
