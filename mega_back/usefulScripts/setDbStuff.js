@@ -28,7 +28,8 @@ async function setClientTable(){
     cpf VARCHAR(11) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(64) NOT NULL,
-    rg VARCHAR(7), phone_number VARCHAR(14),
+    rg VARCHAR(7),
+    phone_number VARCHAR(14),
     address TEXT 
     )`);
     console.log("Client table ok");
@@ -53,7 +54,7 @@ async function setMedications(){
 
     const isDataSaved = (await dbPool.query('SELECT EXISTS (SELECT 1 FROM medications WHERE name = $1)', ['Paracetamol'])).rows[0].exists ;
     if(!isDataSaved){
-        const imagePath = 'http://localhost:port/medicineImages/image.png';
+        const imagePath = 'https://images-americanas.b2w.io/produtos/7469283329/imagens/losartana-hidroclorotiazida-50-12-5mg-30cp/7469283329_1_large.jpg';
         const managerId = 1
         const medications = [
             {
