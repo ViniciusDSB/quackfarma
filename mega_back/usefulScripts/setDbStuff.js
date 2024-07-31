@@ -1,4 +1,37 @@
 const dbPool = require('../dbConnection');
+const sha256 = require('js-sha256');
+
+async function setGodUser(){
+  await dbPool.query( `CREATE TABLE IF NOT EXISTS managers (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(64) NOT NULL 
+    )`)
+    
+  const exists = (await dbPool.query(`SELECT EXISTS (SELECT 1 FROM clients WHERE email = $1)`, ['goduser@gmail.com'])).rows[0].exists;
+  if(!exists){
+    await dbPool.query(`INSERT INTO managers name, email, password_hash`,
+      ['goduser', 'goduser@gmail.com', sha256(`${manager.password}`)]
+    )
+    console.log("god ok");
+  }
+  
+}
+
+async function setClientTable(){
+  await dbPool.query(`CREATE TABLE IF NOT EXISTS clients (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    cpf VARCHAR(11) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(64) NOT NULL,
+    rg VARCHAR(7), phone_number VARCHAR(14),
+    address TEXT 
+    )`);
+    console.log("Client table ok");
+}
+
 async function setMedications(){
     
     await dbPool.query('DROP TABLE IF EXISTS medicines');
@@ -102,6 +135,7 @@ async function setMedications(){
             );
         }
     }
+    console.log("Products ok");
 }
 
-module.exports = { setMedications };
+module.exports = { setGodUser , setClientTable, setMedications };
