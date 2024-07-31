@@ -5,7 +5,9 @@ const cors = require("cors");
 
 const {app, express} = require('./expressApp');
 
-const { setMedications } = require('./usefulScripts/addMedicines');
+const { setGodUser , setClientTable, setMedications } = require('./usefulScripts/setDbStuff');
+setGodUser();
+setClientTable();
 setMedications();
 
 const basicRoutes = require("./routes");
