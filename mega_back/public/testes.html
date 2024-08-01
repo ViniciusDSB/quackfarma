@@ -93,7 +93,7 @@
         <form action="/cadastrarMedicamento" method="post">
             <h2>Adicionar ao estoque</h2>
             <input type="text" name="medName" placeholder="nome">
-            <input type="number" name="medCode" placeholder="Codigo do mecidamento">
+            <input type="number" name="medCode" placeholder="Codigo do medicamento">
             <input type="text" name="medCategory" placeholder="Categoria">
             <input type="text" name="medDescription" placeholder="Descrição">
             <input type="number" name="medUnitPrice" step="0.01" placeholder="Preço da unidade">
@@ -114,6 +114,20 @@
             <h2>Buscar Medicamento</h2>
             <input type="number" name="code" placeholder="meidicineCode">
             <button type="submit">Buscar</button>
+        </form>
+
+        <form action="/adicionarCarrinho" method="post">
+            <h2>Adicionar produto no carrinho</h2>
+            <input type="number" name="medCode" placeholder="Codigo do medicamento" required>
+            <input type="number" name="prodQnt" placeholder="Quantidade" required>
+            <input type="checkbox" name="needsRecipe" id="needRecipeCheckBox">
+            <label for="needRecipeCheckBox">Necessita Receita?</label>
+            <button type="submit">Adicionar</button>
+        </form>
+
+        <form action="/verCarrinho" method="get">
+            <h2>Visualizar Carrinho</h2>
+            <button type="submit">Visualizar</button>
         </form>
     </div>
 

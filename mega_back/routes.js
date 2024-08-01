@@ -125,8 +125,32 @@ router.post("/cadastrarMedicamento", async (req, res) => {
             res.status(SERVER_ERR).send('Erro ao cadastrar medicamento. Veirfique o log.');
         }
     }
-})
+});
 
+router.post('/adicionarCarrinho', async (req, res) => {
+    try{
+        const code = req.body.medCode;
+        const quantity = req.body.prodQnt;
+        const approval = req.body.needsRecipe ? true : false;
+
+        await dbPool.query(`INSERT INTO cart_item(medicine_id, sold_amount, approval_status) VALUES($1, $2, $3)`, 
+            [code, quantity, approval]);
+        res.status(OK).json( {'message': 'Medicamento adicionado ao carrinho!'} );
+    }catch(err){
+        console.error('Erro na rota /adicionarCarrinho', err);
+        res.status(SERVER_ERR).send('Erro ao inserir no carrinho. Verifique o log.');
+    }
+});
+
+router.get('/verCarrinho', async (req, res) => {
+    try{
+        const produtos = await dbPool.query('SELECT medicine_id, sold_amount, approval_status FROM cart_item');
+        res.status(OK).json( {'message': DEFAULT_MESSAGE, 'cart_list': produtos.rows} )
+    }catch{
+        console.error('Erro na rota /listarMedicamentos', err);
+        res.status(SERVER_ERR).send('Erro ao encontrar produtos. Verifique o log.');
+    }
+})
 
 router.post('/fazerLogin', async (req, res) => {
 try{
@@ -179,14 +203,7 @@ try{
 })
 
 router.post('/cadastrarAdm', async (req, res) => {
-try{
-    await dbPool.query( `CREATE TABLE IF NOT EXISTS managers (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        email VARCHAR(255) NOT NULL UNIQUE,
-        password_hash VARCHAR(64) NOT NULL 
-        )`)
-    
+try{  
     const manager = new UserManager(
         req.body.name,
         req.body.email,
