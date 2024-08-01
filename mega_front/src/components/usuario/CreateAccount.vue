@@ -10,21 +10,25 @@
         <div class="font-weight-medium text-h3 d-flex justify-center">Criar Conta</div>
       </v-card-title>
       <v-card-text>
-        <v-form ref="form">
+        <v-form ref="form" class="mx-10">
           <div v-show="firstPage">
-            <v-text-field label="Nome" v-model="formData.nome" :rules="nameRules" required/>
+            <v-text-field label="Nome" v-model="formData.nome" :rules="nameRules" class="background-color my-5 rounded-lg"
+                          hide-details="auto" required/>
             <v-text-field label="CPF" placeholder="000.000.000-00" v-model="formData.cpf" :rules="cpfRules"
-                          maxlength="14" v-mask="['###.###.###-##']" required/>
-            <v-text-field label="RG" v-model="formData.rg" maxlength="9"/>
+                          hide-details="auto"
+                          maxlength="14" v-mask="['###.###.###-##']" class="background-color my-5 rounded-lg" required/>
+            <v-text-field label="RG"  v-model="formData.rg" maxlength="9" class="background-color my-5 rounded-lg"
+                          hide-details="auto" />
             <v-text-field label="E-mail" type="email" placeholder="seu_email@email.com" v-model="formData.email"
-                          :rules="emailRules" required/>
+                          :rules="emailRules" required class="background-color my-5 rounded-lg" hide-details="auto"/>
             <v-text-field label="Telefone" placeholder="(XX) XXXXX-XXXX" v-model="formData.telefone" maxlength="15"
-                          v-mask="['(##) #####-####']"
+                          v-mask="['(##) #####-####']" class="background-color my-5 rounded-lg" hide-details="auto"
             />
-            <v-text-field label="Endereço" v-model="formData.endereco"/>
+            <v-text-field label="Endereço" hide-details="auto" class="background-color my-5 rounded-lg"
+                          v-model="formData.endereco"/>
           </div>
         </v-form>
-        <v-form ref="senhaForm">
+        <v-form ref="senhaForm" class="mx-10">
           <div v-show="!firstPage">
             <v-text-field
                 v-model="senha"
@@ -34,6 +38,7 @@
                 @click:append-inner="visible = !visible"
                 :rules="senhaRules"
                 maxlength="10"
+                class="background-color my-5 rounded-lg" hide-details="auto"
             ></v-text-field>
             <v-text-field
                 v-model="confirmarSenha"
@@ -43,6 +48,7 @@
                 @click:append-inner="visible = !visible"
                 :rules="senhaRules"
                 maxlength="10"
+                class="background-color my-5 rounded-lg" hide-details="auto"
             ></v-text-field>
             <v-alert color="error" variant="outlined" text="Senha deve conter de 6 a 10 caracteres, contendo pelo menos
             uma letra maiúscula, uma letra minuscula, um número e um caractere especial.">
@@ -55,7 +61,7 @@
                class="bg-green-lighten-3" @click="rollback()">
           Voltar
         </v-btn>
-        <v-btn rounded="xl" class="ma-2 pa-2 bg-green-lighten-1 d-flex justify-space-between"
+        <v-btn rounded="xl" class="ma-2 pa-2 btn-color d-flex justify-space-between"
                append-icon="mdi-arrow-right-thin" @click="continueBtn">
           Continuar
         </v-btn>
@@ -154,5 +160,8 @@ export default {
 
 </script>
 <style scoped>
+input {
+  margin: 10rem 0 10rem 0;
+}
 
 </style>

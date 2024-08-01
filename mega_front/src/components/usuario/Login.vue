@@ -10,9 +10,9 @@
         <div class="font-weight-medium text-h3 d-flex justify-center">Login</div>
       </v-card-title>
       <v-card-text>
-        <v-form>
-          <v-text-field label="Email" type="email"></v-text-field>
-          <v-text-field
+        <v-form class="mx-10">
+          <v-text-field  class="background-color rounded-lg my-10" hide-details label="Email" type="email"/>
+          <v-text-field  class="background-color rounded-lg"  hide-details
               :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
               :type="visible ? 'text' : 'password'"
               placeholder="Senha"
@@ -20,7 +20,7 @@
           ></v-text-field>
           <v-card-actions>
             <a class="flex-1-0 ma-2 pa-2" href="">Esqueceu a senha?</a>
-            <v-btn rounded="xl" class="ma-2 pa-2 bg-green-lighten-1" append-icon="mdi-arrow-right-thin">
+            <v-btn rounded="xl" class="ma-2 pa-2 btn-color"  append-icon="mdi-arrow-right-thin">
               Continuar
             </v-btn>
           </v-card-actions>
@@ -34,7 +34,7 @@
         <div class="font-weight-medium text-h6 d-flex justify-center">Ainda não tem conta?</div>
       </v-card-title>
       <v-card-actions class="d-flex justify-center">
-        <v-btn rounded="xl" size="large" class="bg-green-lighten-1" @click="$refs.createAccount.open(),this.dialog = false">
+        <v-btn rounded="xl" size="large" class="btn-color" @click="$refs.createAccount.open(),this.dialog = false">
           Criar Conta
         </v-btn>
       </v-card-actions>
@@ -69,6 +69,3 @@ export default {
 
 
 </script>
-<style scoped>
-
-</style>
