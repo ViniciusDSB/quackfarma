@@ -1,14 +1,57 @@
 openapi: 3.0.0
 info:
-  version: '1.0'
   title: mega_back endpoints documentation
-  description: routes, requests and responses of our server
+  description: "Routes, requests responses and database operation"
+  version: "1.1"
+servers:
+- url: https://virtserver.swaggerhub.com/VINIDSB580/mega_back/1.1
+  description: SwaggerHub API Auto Mocking
+- url: http://localhost:3001
 paths:
   /verMedicamento:
+    get:
+      summary: Returns the information about a single product
+      responses:
+        '200':
+          description: products information sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  medicine_data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        code:
+                          type: string
+                        category:
+                          type: string
+                        description:
+                          type: string
+                        unit_price:
+                          type: number
+                        needs_recipe:
+                          type: boolean
+                        image_path:
+                          type: string
+                        on_stock:
+                          type: string
+        '400':
+          description: Error processing request
+        '404':
+          description: Product not found
+        '500':
+          description: server internal error
 
   /listarMedicamentos:
     get:
-      summary: Returs a list of medicines
+      summary: Returs a list of products and it's basic information.
       responses:
         '200':
           description: products list sent
@@ -24,17 +67,20 @@ paths:
                     items:
                       type: object
                       properties:
-                        medName:
+                        name:
                           type: string
-                        medDescription:
+                        code:
                           type: string
-                        medUnitPrice:
+                        category:
+                          type: string
+                        description:
+                          type: string
+                        unit_price:
                           type: number
-                        needRecipe:
-                          type: boolean
-      '500':
-         description: server internal error
-
+                        image_path:
+                          type: string
+        '500':
+          description: server internal error
 
   /cadastrarMedicamento:
     post:
@@ -48,13 +94,19 @@ paths:
               properties:
                 medName:
                   type: string
+                medCode:
+                  type: number
+                medCategory:
+                  type: string
                 medDescription:
                   type: string
                 medUnitPrice:
                   type: number
                 amountOnStock:
-                  type: integer
+                  type: number
                 managerWhoAdded:
+                  type: number #manager id
+                imagePath:
                   type: string
                 needRecipe:
                   type: boolean
@@ -69,10 +121,26 @@ paths:
                   message:
                     type: string
         '400':
-          description: some invalid data, invalid sintax etc
+          description: Returns error message like invalid data, invalid sintax etc
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '401':
+          description: Unauthorized data, alredy exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
         '500':
           description: server internal error
-  
+
 
   /cadastrarCli:
     post:
@@ -95,26 +163,23 @@ paths:
                 passwordRepeat:
                   type: string
                 rg:
-                  type: integer
+                  type: string
                 address:
                   type: string
                 phone:
-                  type: integer
+                  type: string
       responses:
-        '201':
+        "201":
           description: client registration created
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  message:
+                  message: 
                     type: string
-                  email:
-                    type: string
-                  name:
-                    type: string
-        '400':
+                
+        "400":
           description: some data may be invalid, wrong sintax, characters, size etc
           content:
             application/json:
@@ -123,12 +188,8 @@ paths:
                 properties:
                   message:
                     type: string
-                  email:
-                    type: string
-                  name:
-                    type: string
-        '401':
-          description: unauthorized credentials
+        "401":
+          description: registration unauthorized, user data alredy exists
           content:
             application/json:
               schema:
@@ -136,13 +197,9 @@ paths:
                 properties:
                   message:
                     type: string
-                  email:
-                    type: string
-                  name:
-                    type: string
-        '500':
+        "500":
           description: server internal error
-        
+
   /cadastrarAdm:
     post:
       summary: Validate data and register a manager
@@ -162,7 +219,7 @@ paths:
                 passwordRepeat:
                   type: string
       responses:
-        '201':
+        "201":
           description: manager registration created
           content:
             application/json:
@@ -171,11 +228,7 @@ paths:
                 properties:
                   message:
                     type: string
-                  email:
-                    type: string
-                  name:
-                    type: string
-        '400':
+        "400":
           description: some data may be invalid, wrong sintax, characters, size etc
           content:
             application/json:
@@ -184,12 +237,8 @@ paths:
                 properties:
                   message:
                     type: string
-                  email:
-                    type: string
-                  name:
-                    type: string
-        '401':
-          description: unauthorized credentials
+        "401":
+          description: unauthorized data, alredy exists
           content:
             application/json:
               schema:
@@ -197,11 +246,7 @@ paths:
                 properties:
                   message:
                     type: string
-                  email:
-                    type: string
-                  name:
-                    type: string
-        '500':
+        "500":
           description: server internal error
   
   /fazerLogin:
@@ -219,8 +264,8 @@ paths:
                 password:
                   type: string
       responses:
-        '202':
-          description: login accepted
+        "202":
+          description: client login accepted
           content:
             application/json:
               schema:
@@ -228,12 +273,22 @@ paths:
                 properties:
                   message:
                     type: string
+                  is_adm:
+                    type: boolean
                   email:
                     type: string
                   name:
                     type: string
-        '401':
-          description: incorrect email or password
+                  cpf:
+                    type: string
+                  rg:
+                    type: string
+                  phone_number:
+                    type: number
+                  address:
+                    type: string
+        "209":
+          description: manager login accepted
           content:
             application/json:
               schema:
@@ -241,12 +296,15 @@ paths:
                 properties:
                   message:
                     type: string
+                  is_adm:
+                    type: boolean
                   email:
                     type: string
                   name:
                     type: string
-        '400':
-          description: data validation error, not an email, not allowed characters, etc
+        "400":
+          description: "data validation error, not an email, not allowed characters,\
+            \ etc"
           content:
             application/json:
               schema:
@@ -254,15 +312,23 @@ paths:
                 properties:
                   message:
                     type: string
-                  email:
+        "401":
+          description: incorrect  password
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
                     type: string
-                  name:
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
                     type: string
-        '500':
+        "500":
           description: server internal error
-
-servers:
-  # Added by API Auto Mocking Plugin
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/VINIDSB580/mega_back/1.0
-  - url: http://localhost:3001
