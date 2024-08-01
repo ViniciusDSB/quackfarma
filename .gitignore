@@ -1,4 +1,8 @@
-docker_files
 mega_back/node_modules
+mega_back/public/uploads/medicinesImg/*
+!mega_back/public/uploads/medicinesImg/defalutMed.png
+
 mega_front/node_modules
+
+docker_files
 notes
