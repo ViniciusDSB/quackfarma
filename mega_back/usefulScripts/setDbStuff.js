@@ -55,7 +55,7 @@ async function setMedications(){
 
     const isDataSaved = (await dbPool.query('SELECT EXISTS (SELECT 1 FROM medications WHERE name = $1)', ['Paracetamol'])).rows[0].exists ;
     if(!isDataSaved){
-        const imagePath = 'https://images-americanas.b2w.io/produtos/7469283329/imagens/losartana-hidroclorotiazida-50-12-5mg-30cp/7469283329_1_large.jpg';
+        const imagePath = `http://localhost:3001/uploads/medicinesImg/defaultMed.png`;
         const managerId = 1
         const medications = [
             {

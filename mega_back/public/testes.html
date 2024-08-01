@@ -90,7 +90,7 @@
             <button type="submit">Logar</button>
         </form>
 
-        <form action="/cadastrarMedicamento" method="post">
+        <form action="/cadastrarMedicamento" method="post" enctype="multipart/form-data">
             <h2>Adicionar ao estoque</h2>
             <input type="text" name="medName" placeholder="nome">
             <input type="number" name="medCode" placeholder="Codigo do mecidamento">
@@ -99,7 +99,9 @@
             <input type="number" name="medUnitPrice" step="0.01" placeholder="Preço da unidade">
             <input type="number" name="amountOnStock" placeholder="Qtd. em estoque">
             <input type="number" name="managerWhoAdded" placeholder="Quem adicionou" value=1>
-            <input type="text" name="imagePath" value="localhost:port/medicineImages/image.png">
+
+            <input type="file" name="imageFile">
+
             <input type="checkbox" name="needsRecipe"id="needRecipeCheckBox">
             <label for="needRecipeCheckBox">Precisa de receita?</label>
             <button type="submit">Salvar</button>
