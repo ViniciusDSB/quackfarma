@@ -2,6 +2,7 @@ const {app, express} = require('./expressApp');
 const router = express.Router();
 const sha256 = require('js-sha256');
 const path = require('path');
+const multer = require('multer');
 
 
 //http codes 
@@ -61,9 +62,20 @@ router.get('/listarMedicamentos', async (req, res) => {
     }
 })
 
-router.post("/cadastrarMedicamento", async (req, res) => {
+
+const uploadMedImages = multer( {dest: './public/uploads/medicinesImg/'} );
+router.post("/cadastrarMedicamento", uploadMedImages.single('imageFile'), async (req, res) => {
     try{
-            
+
+        const medImage = req.file;
+        if(!medImage)
+            return res.status(BAD_REQUEST).json( {'message': 'Campo de imagem não fora preenchido!'});
+        
+        if(!/^image/.test(medImage.mimetype))
+            return res.status(BAD_REQUEST).json( {'message': 'O arquivo não é uma imagem!'});
+        
+        const imageUrl = `http://localhost:3001/uploads/medicinesImg/${medImage.filename}`;
+        
         const needsRecipe = req.body.needsRecipe? true : false;
         const medicine = new Medicine(
             req.body.medName,
@@ -73,7 +85,7 @@ router.post("/cadastrarMedicamento", async (req, res) => {
             req.body.medUnitPrice,
             req.body.amountOnStock,
             req.body.managerWhoAdded,
-            req.body.imagePath,
+            imageUrl,
             needsRecipe
         );
         medicine.validadeData();
@@ -105,15 +117,15 @@ router.post("/cadastrarMedicamento", async (req, res) => {
                     new Date(), new Date()
                 ]);
                    
-            res.status(OK).json( {'message': 'Medicamento adicionado ao estoque!'} );
+            res.status(CREATED).json( {'message': 'Medicamento adicionado ao estoque!'} );
         }else{
             res.status(BAD_REQUEST).json( {'message': medicine.status} );
         }
     }catch(err){
         if(err.code === '23505'){
             const match = err.detail.match(/Key \(([^)]+)\)=\(([^)]+)\)/);
-            const key = "";
-            const value= "";
+            let key = "";
+            let value= "";
             if (match) {
                 key = match[1];
                 value = match[2];
@@ -339,8 +351,8 @@ try{
 
     if(err.code === '23505'){
         const match = err.detail.match(/Key \(([^)]+)\)=\(([^)]+)\)/);
-        const key = "";
-        const value= "";
+        let key = "";
+        let value= "";
         if (match) {
             key = match[1];
             value = match[2];
@@ -356,17 +368,6 @@ try{
 
 router.post("/cadastrarCli", async (req, res) => {
     try{
-
-        await dbPool.query(`CREATE TABLE IF NOT EXISTS client (
-            id SERIAL PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            cpf VARCHAR(11) NOT NULL UNIQUE,
-            email VARCHAR(255) NOT NULL UNIQUE,
-            password_hash VARCHAR(64) NOT NULL,
-            rg VARCHAR(7),
-            phone_number VARCHAR(14),
-            address TEXT 
-            )`);
 
         const registration = new UserClient(
             req.body.name,
@@ -412,8 +413,8 @@ router.post("/cadastrarCli", async (req, res) => {
 
         if(err.code === '23505'){
             const match = err.detail.match(/Key \(([^)]+)\)=\(([^)]+)\)/);
-            const key = "";
-            const value= "";
+            let key = "";
+            let value= "";
             if (match) {
                 key = match[1];
                 value = match[2];
