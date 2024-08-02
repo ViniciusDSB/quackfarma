@@ -22,7 +22,7 @@ const { createInflate } = require('zlib');
 
 router.get('/verMedicamento', async (req, res) => {
     try{
-        const medicine_code = req.query.code;
+        const medicine_code = req.query.medCode;
         if(medicine_code) {
             const medicine_data = await dbPool.query('SELECT name, code, category, description, unit_price, needs_recipe, image_path, on_stock FROM medications WHERE code= $1', [medicine_code]);
 
