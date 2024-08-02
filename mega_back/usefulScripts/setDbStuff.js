@@ -54,6 +54,7 @@ async function setMedications(){
       last_update TIMESTAMP)`);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   const isDataSaved = (await dbPool.query('SELECT EXISTS (SELECT 1 FROM medications WHERE name = $1)', ['Paracetamol'])).rows[0].exists ;
   if(!isDataSaved){
       const imagePath = 'https://images-americanas.b2w.io/produtos/7469283329/imagens/losartana-hidroclorotiazida-50-12-5mg-30cp/7469283329_1_large.jpg';
@@ -144,6 +145,8 @@ async function setMedications(){
     console.log("Products ok");
   }
 =======
+=======
+>>>>>>> 75aef31a9385de7aba5555a22d86917e01239ea1
     const isDataSaved = (await dbPool.query('SELECT EXISTS (SELECT 1 FROM medications WHERE name = $1)', ['Paracetamol'])).rows[0].exists ;
     if(!isDataSaved){
         const imagePath = `http://localhost:3001/uploads/medicinesImg/defaultMed.png`;
@@ -233,12 +236,14 @@ async function setMedications(){
     }else{
       console.log("Products ok");
     }
+<<<<<<< HEAD
 >>>>>>> 53d36b9 (feat: adicionei o upload de imagem no cadastro de novo medicamento)
+=======
+>>>>>>> 75aef31a9385de7aba5555a22d86917e01239ea1
     
 }
 
 async function setCart_item(){
-  await dbPool.query('DROP TABLE IF EXISTS cart_item');
   await dbPool.query(`CREATE TABLE IF NOT EXISTS cart_item(
                     id SERIAL PRIMARY KEY,
                     medicine_code INTEGER REFERENCES medications(code) ON DELETE CASCADE NOT NULL,
@@ -249,7 +254,6 @@ async function setCart_item(){
 }
 
 async function setSales(){
-  await dbPool.query('DROP TABLE IF EXISTS sales');
   await dbPool.query(`CREATE TABLE IF NOT EXISTS sales(
                     id SERIAL PRIMARY KEY,
                     shopping_cart INTEGER[] NOT NULL,
