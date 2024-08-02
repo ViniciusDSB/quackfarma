@@ -37,7 +37,7 @@ export default {
   name : 'CardProduto',
   data () {
     return {
-      loading : false
+      loading : true
     }
   }
 }

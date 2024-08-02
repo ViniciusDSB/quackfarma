@@ -38,24 +38,24 @@ async function setClientTable(){
 
 async function setMedications(){
     
-    await dbPool.query('DROP TABLE IF EXISTS medicines');
-    await dbPool.query(`CREATE TABLE IF NOT EXISTS medications(
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        code INTEGER NOT NULL UNIQUE,
-        category VARCHAR(32) NOT NULL,
-        description TEXT NOT NULL,
-        needs_recipe BOOLEAN NOT NULL,
-        unit_price NUMERIC(10, 2) NOT NULL,
-        on_stock INTEGER NOT NULL,
-        manager INTEGER REFERENCES managers(id),
-        image_path TEXT NOT NULL,
-        created_at TIMESTAMP,
-        last_update TIMESTAMP)`);
+  await dbPool.query('DROP TABLE IF EXISTS medicines');
+  await dbPool.query(`CREATE TABLE IF NOT EXISTS medications(
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      code INTEGER NOT NULL UNIQUE,
+      category VARCHAR(32) NOT NULL,
+      description TEXT NOT NULL,
+      needs_recipe BOOLEAN NOT NULL,
+      unit_price NUMERIC(10, 2) NOT NULL,
+      on_stock INTEGER NOT NULL,
+      manager INTEGER REFERENCES managers(id),
+      image_path TEXT NOT NULL,
+      created_at TIMESTAMP,
+      last_update TIMESTAMP)`);
 
     const isDataSaved = (await dbPool.query('SELECT EXISTS (SELECT 1 FROM medications WHERE name = $1)', ['Paracetamol'])).rows[0].exists ;
     if(!isDataSaved){
-        const imagePath = 'https://images-americanas.b2w.io/produtos/7469283329/imagens/losartana-hidroclorotiazida-50-12-5mg-30cp/7469283329_1_large.jpg';
+        const imagePath = `http://localhost:3001/uploads/medicines_images/defaultMed.png`;
         const managerId = 1
         const medications = [
             {
@@ -145,4 +145,38 @@ async function setMedications(){
     
 }
 
-module.exports = { setGodUser , setClientTable, setMedications };
+async function setCart_item(){
+  await dbPool.query(`CREATE TABLE IF NOT EXISTS cart_item(
+                    id SERIAL PRIMARY KEY,
+                    medicine_code INTEGER REFERENCES medications(code) ON DELETE CASCADE NOT NULL,
+                    sold_amount INTEGER NOT NULL,
+                    item_total NUMERIC(10, 2) NOT NULL,
+                    approval_status BOOLEAN NOT NULL)`);
+  console.log("Cart_item ok");
+}
+
+async function setSales(){
+  await dbPool.query(`CREATE TABLE IF NOT EXISTS sales(
+                    id SERIAL PRIMARY KEY,
+                    shopping_cart INTEGER[] NOT NULL,
+                    date_time TIMESTAMP NOT NULL,
+                    payment_method VARCHAR(16),
+                    sale_total NUMERIC(10, 2) NOT NULL,
+                    client INTEGER REFERENCES client(id) ON DELETE CASCADE NOT NULL)`);
+  console.log("Sales ok");
+}
+
+async function setupDatabase(){
+  try {
+    await setGodUser();
+    await setClientTable();
+    await setMedications();
+    await setCart_item();
+    await setSales();
+    console.log("Database setup complete");
+  } catch (err) {
+    console.error("Erro na configuração do banco de dados", err);
+  }
+}
+
+module.exports = { setupDatabase };
