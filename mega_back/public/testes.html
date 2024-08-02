@@ -129,6 +129,14 @@
             <h2>Visualizar Carrinho</h2>
             <button type="submit">Visualizar</button>
         </form>
+
+        <form action="/caixa" method="post">
+            <h2>Finalizar Venda</h2>
+
+            <input type="text" name="paymentMethod" placeholder="Método de Pagamento" required>
+            <input type="number" name="clientId" placeholder="ID do Cliente" required>
+            <button type="submit">Finalizar Venda</button>
+        </form>
     </div>
 
     <div id="right">

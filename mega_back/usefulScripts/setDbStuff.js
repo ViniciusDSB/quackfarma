@@ -149,8 +149,9 @@ async function setCart_item(){
   await dbPool.query('DROP TABLE IF EXISTS cart_item');
   await dbPool.query(`CREATE TABLE IF NOT EXISTS cart_item(
                     id SERIAL PRIMARY KEY,
-                    medicine_id INTEGER REFERENCES medications(code) ON DELETE CASCADE NOT NULL,
+                    medicine_code INTEGER REFERENCES medications(code) ON DELETE CASCADE NOT NULL,
                     sold_amount INTEGER NOT NULL,
+                    item_total NUMERIC(10, 2) NOT NULL,
                     approval_status BOOLEAN NOT NULL)`);
   console.log("Cart_item ok");
 }
