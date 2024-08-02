@@ -20,8 +20,7 @@ paths:
               type: object
               properties:
                 sale_id:
-                  type: integer #if not exists receives a sale-id and a client_id and returns an object with all the information abotu a sale  and its items
-                  s a null or undefined or an empty string
+                  type: integer #if not exists receives a sale-id and a client_id and returns an object with all the information abotu a sale  and its items s a null or undefined or an empty string
                 client_id:
                   type: integer
                 medCode:
@@ -77,31 +76,32 @@ paths:
                     type: number
                   shopping_cart:
                     type: array
-                      items:
-                        type: object
-                        properties:
-                          id:
-                            type: integer
-                          medicine_code:
-                            type: integer
-                          sold_amount:
-                            type: integer
-                          item_total:
-                            type: number
-                          approval_status:
-                            type: boolean
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        medicine_code:
+                          type: integer
+                        sold_amount:
+                          type: integer
+                        item_total:
+                          type: number
+                        approval_status:
+                          type: boolean
         '500':
           description: server internal error
 
-  /verMedicamento:
+  /verMedicamento/{medCode}:
     get:
       summary: Returns the information about a single product
       parameters:
-        - name: medCode
-        in: path
-        required: true
-        schema:
-          type: integer
+        - in: path
+          name: medCode
+          schema:
+            type: integer
+          required: true
+          description: Four digit medicaton code
       responses:
         '200':
           description: products information sent
