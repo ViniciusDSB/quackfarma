@@ -146,7 +146,11 @@ async function setMedications(){
 =======
     const isDataSaved = (await dbPool.query('SELECT EXISTS (SELECT 1 FROM medications WHERE name = $1)', ['Paracetamol'])).rows[0].exists ;
     if(!isDataSaved){
+<<<<<<< HEAD
         const imagePath = `http://localhost:3001/uploads/medicinesImg/defaultMed.png`;
+=======
+        const imagePath = `http://localhost:3001/uploads/medicines_images/defaultMed.png`;
+>>>>>>> devops
         const managerId = 1
         const medications = [
             {
@@ -238,17 +242,28 @@ async function setMedications(){
 }
 
 async function setCart_item(){
+<<<<<<< HEAD
   await dbPool.query('DROP TABLE IF EXISTS cart_item');
   await dbPool.query(`CREATE TABLE IF NOT EXISTS cart_item(
                     id SERIAL PRIMARY KEY,
                     medicine_id INTEGER REFERENCES medications(code) ON DELETE CASCADE NOT NULL,
                     sold_amount INTEGER NOT NULL,
+=======
+  await dbPool.query(`CREATE TABLE IF NOT EXISTS cart_item(
+                    id SERIAL PRIMARY KEY,
+                    medicine_code INTEGER REFERENCES medications(code) ON DELETE CASCADE NOT NULL,
+                    sold_amount INTEGER NOT NULL,
+                    item_total NUMERIC(10, 2) NOT NULL,
+>>>>>>> devops
                     approval_status BOOLEAN NOT NULL)`);
   console.log("Cart_item ok");
 }
 
 async function setSales(){
+<<<<<<< HEAD
   await dbPool.query('DROP TABLE IF EXISTS sales');
+=======
+>>>>>>> devops
   await dbPool.query(`CREATE TABLE IF NOT EXISTS sales(
                     id SERIAL PRIMARY KEY,
                     shopping_cart INTEGER[] NOT NULL,

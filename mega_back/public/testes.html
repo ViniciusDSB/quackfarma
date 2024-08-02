@@ -118,18 +118,28 @@
             <button type="submit">Buscar</button>
         </form>
 
-        <form action="/adicionarCarrinho" method="post">
+        <form action="/adicionarAoCarrinho" method="post">
             <h2>Adicionar produto no carrinho</h2>
             <input type="number" name="medCode" placeholder="Codigo do medicamento" required>
-            <input type="number" name="prodQnt" placeholder="Quantidade" required>
-            <input type="checkbox" name="needsRecipe" id="needRecipeCheckBox">
-            <label for="needRecipeCheckBox">Necessita Receita?</label>
+            <input type="number" name="item_qtd" placeholder="Quantidade" required>
+            <input type="number" name="sale_id" placeholder="id da venda">
+            <input type="number" name="client_id" placeholder="id do cliente">
             <button type="submit">Adicionar</button>
         </form>
 
-        <form action="/verCarrinho" method="get">
+        <form action="/verCarrinho" method="post">
             <h2>Visualizar Carrinho</h2>
+            <input type="number" name="sale_id" placeholder="id da venda">
+            <input type="number" name="client_id" placeholder="id do cliente">
             <button type="submit">Visualizar</button>
+        </form>
+
+        <form action="/caixa" method="post">
+            <h2>Finalizar Venda</h2>
+
+            <input type="text" name="paymentMethod" placeholder="Método de Pagamento" required>
+            <input type="number" name="clientId" placeholder="ID do Cliente" required>
+            <button type="submit">Finalizar Venda</button>
         </form>
     </div>
 
