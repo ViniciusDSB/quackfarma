@@ -75,7 +75,7 @@ router.post("/cadastrarMedicamento", uploadMedImages.single('imageFile'), async 
         if(!/^image/.test(medImage.mimetype))
             return res.status(BAD_REQUEST).json( {'message': 'O arquivo não é uma imagem!'});
         
-        const imageUrl = `http://localhost:3001/uploads/medicinesImg/${medImage.filename}`;
+        const imageUrl = `http://localhost:3001/uploads/medicines_images/${medImage.filename}`;
         
         const needsRecipe = req.body.needsRecipe? true : false;
         const medicine = new Medicine(
@@ -156,8 +156,11 @@ addCrrinho:
     }
 */
 
-//tem que verificar se o client da venda é o mesmo que adiconou ao carrinho
+//tem que verificar se o client da venda é o mesmo que adiconou ao carrinho, tambem na verCarrinho
 //verificar se a quantidade esta disponivel no estoque
+//adicionar na tabela o campo reviwed: boolean
+//verfiicar se o medicamento precisa de receita, colcoar true em approval se nao precisar
+
 async function updateSales(cartItem_id, item_total, sale_id){
     const appendToSalesCart = `UPDATE sales SET shopping_cart = array_append(shopping_cart, $1) WHERE id = $2`;
     const getSaleTotalQuery = `SELECT sale_total FROM sales WHERE id = $1`;
@@ -189,7 +192,7 @@ async function insertNewCart_item(medCode, item_qtd){
     return itemObj;
 }
 
-router.post('/adicionarCarrinho', async (req, res) => {
+router.post('/adicionarAoCarrinho', async (req, res) => {
     
     try{
         const {sale_id, client_id, medCode, item_qtd } = req.body;
@@ -228,38 +231,43 @@ router.post('/adicionarCarrinho', async (req, res) => {
     }
 });
 
-router.get('/verCarrinho', async (req, res) => {
+router.post('/verCarrinho', async (req, res) => {
     try{
-        const produtos = await dbPool.query('SELECT medicine_code, sold_amount, item_total, approval_status FROM cart_item');
-        res.status(OK).json( {'message': DEFAULT_MESSAGE, 'cart_list': produtos.rows} )
-    }catch{
+        const {sale_id, client_id } = req.body;
+
+        const findSaleQuery = `SELECT * FROM sales WHERE id = $1`;
+        const findItemsQuery = `SELECT * FROM cart_item WHERE id = $1`
+
+        const sale = await dbPool.query(findSaleQuery, [sale_id]);
+        const cart_items = sale.rows[0].shopping_cart;
+        let shopping_cart = [];
+
+        for(item_id of cart_items){
+            const itemData = await dbPool.query(findItemsQuery, [item_id]);
+            shopping_cart.push( itemData.rows[0] );
+        }
+
+        let responseData = {
+            'message': DEFAULT_MESSAGE,
+            'id': sale.rows[0].id,
+            'date_time': sale.rows[0].date_time,
+            'pay_method': sale.rows[0].payment_method,
+            'total': sale.rows[0].sale_total,
+            'shopping_cart': shopping_cart
+        }
+
+        res.status(OK).json( { responseData});
+
+        //const produtos = await dbPool.query('SELECT medicine_code, sold_amount, item_total, approval_status FROM cart_item');
+        //res.status(OK).json( {'message': DEFAULT_MESSAGE, 'cart_list': produtos.rows} )
+    }catch(err){
         console.error('Erro na rota /listarMedicamentos', err);
         res.status(SERVER_ERR).send('Erro ao encontrar produtos no carrinho. Verifique o log.');
     }
 });
 
-/* vender:
-ID_de_venda = req.body.ID_de_venda
-item_para_add = req.body.itemPraAdd -> codigo do medicamento
-qtd_do_item = req.body
 
-addCrrinho:
-    ID_de_venda = req.body.ID_de_venda
-    item_para_add = req.body.itemPraAdd -> codigo do medicamento
-    qtd_do_item = req.body
-    
-    if(req.body.sale_id){
-        cria um novo item
-        pega o id desse item
-        adicoina o item na venda, cujo o id é o ID_de_venda
-    }else{
-        criar o item e pegar o id
-        criar a venda e pega ro id e adicionar o item
-    }
-
-*/
-
-router.post('/finalizarVenda', async (req, res) => {
+router.post('/caixa', async (req, res) => {
     try{
         const { sale_id, pagamento, total, cliente } = req.body;
 
