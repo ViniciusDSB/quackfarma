@@ -64,7 +64,7 @@ router.get('/listarMedicamentos', async (req, res) => {
 })
 
 
-const uploadMedImages = multer( {dest: './public/uploads/medicinesImg/'} );
+const uploadMedImages = multer( {dest: './public/uploads/medicines_images/'} );
 router.post("/cadastrarMedicamento", uploadMedImages.single('imageFile'), async (req, res) => {
     try{
 
