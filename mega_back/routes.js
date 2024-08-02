@@ -2,6 +2,7 @@ const {app, express} = require('./expressApp');
 const router = express.Router();
 const sha256 = require('js-sha256');
 const path = require('path');
+const multer = require('multer');
 
 
 //http codes 
@@ -17,6 +18,7 @@ const SERVER_ERR = 500;
 //database, pg pool (located at ./dbConnection.js)
 const dbPool = require('./dbConnection');
 const { Login, User , UserManager, UserClient , Medicine, DEFAULT_MESSAGE} = require("./myClasses");
+const { createInflate } = require('zlib');
 
 router.get('/verMedicamento', async (req, res) => {
     try{
@@ -61,9 +63,20 @@ router.get('/listarMedicamentos', async (req, res) => {
     }
 })
 
-router.post("/cadastrarMedicamento", async (req, res) => {
+
+const uploadMedImages = multer( {dest: './public/uploads/medicinesImg/'} );
+router.post("/cadastrarMedicamento", uploadMedImages.single('imageFile'), async (req, res) => {
     try{
-            
+
+        const medImage = req.file;
+        if(!medImage)
+            return res.status(BAD_REQUEST).json( {'message': 'Campo de imagem não fora preenchido!'});
+        
+        if(!/^image/.test(medImage.mimetype))
+            return res.status(BAD_REQUEST).json( {'message': 'O arquivo não é uma imagem!'});
+        
+        const imageUrl = `http://localhost:3001/uploads/medicinesImg/${medImage.filename}`;
+        
         const needsRecipe = req.body.needsRecipe? true : false;
         const medicine = new Medicine(
             req.body.medName,
@@ -73,7 +86,7 @@ router.post("/cadastrarMedicamento", async (req, res) => {
             req.body.medUnitPrice,
             req.body.amountOnStock,
             req.body.managerWhoAdded,
-            req.body.imagePath,
+            imageUrl,
             needsRecipe
         );
         medicine.validadeData();
@@ -105,15 +118,15 @@ router.post("/cadastrarMedicamento", async (req, res) => {
                     new Date(), new Date()
                 ]);
                    
-            res.status(OK).json( {'message': 'Medicamento adicionado ao estoque!'} );
+            res.status(CREATED).json( {'message': 'Medicamento adicionado ao estoque!'} );
         }else{
             res.status(BAD_REQUEST).json( {'message': medicine.status} );
         }
     }catch(err){
         if(err.code === '23505'){
             const match = err.detail.match(/Key \(([^)]+)\)=\(([^)]+)\)/);
-            const key = "";
-            const value= "";
+            let key = "";
+            let value= "";
             if (match) {
                 key = match[1];
                 value = match[2];
@@ -143,40 +156,68 @@ addCrrinho:
     }
 */
 
-async function add_to_cart(medCode, quantity){
-    const med_price = await dbPool.query(`SELECT unit_price FROM medications WHERE code = $1`,
-        [medCode]
-    );
-    const item_total = (med_price.rows[0].unit_price) * quantity;
+//tem que verificar se o client da venda é o mesmo que adiconou ao carrinho
+//verificar se a quantidade esta disponivel no estoque
+async function updateSales(cartItem_id, item_total, sale_id){
+    const appendToSalesCart = `UPDATE sales SET shopping_cart = array_append(shopping_cart, $1) WHERE id = $2`;
+    const getSaleTotalQuery = `SELECT sale_total FROM sales WHERE id = $1`;
+    const updateSaleTotalQuery = `UPDATE sales SET sale_total = $1 WHERE id = $2`
+
+    let currentSaleTotal = ( await dbPool.query( getSaleTotalQuery, [sale_id]) ).rows[0].sale_total;
+    const new_sale_total = parseFloat(currentSaleTotal) + parseFloat(item_total)
+    
+    await dbPool.query( appendToSalesCart, [cartItem_id, sale_id]);
+    await dbPool.query(updateSaleTotalQuery, [new_sale_total, sale_id]);
+}
+
+async function insertNewCart_item(medCode, item_qtd){
+    const insertIntoCart_item = `INSERT INTO cart_item (
+        medicine_code,
+        sold_amount,
+        item_total,
+        approval_status
+        ) VALUES($1, $2, $3, $4) RETURNING id`;
+    const getMedPrice = `SELECT unit_price FROM medications WHERE code = $1`;
     const approval_status = false;
-    const cartItem_id = await dbPool.query(`INSERT INTO cart_item(medicine_code, sold_amount, approval_status) VALUES($1, $2, $3) RETURNING id`, 
-        [medCode, quantity, item_total, approval_status]
-    );
-    return {'id': cartItem_id, 'total': item_total};
+
+    const med_price = (await dbPool.query( getMedPrice, [medCode] )).rows[0].unit_price;
+    let item_total = med_price * item_qtd;
+
+    const cartItem_id = (await dbPool.query(insertIntoCart_item,[medCode, item_qtd, item_total, approval_status])).rows[0].id;
+    const itemObj = {id: cartItem_id, total: item_total}
+
+    return itemObj;
 }
 
 router.post('/adicionarCarrinho', async (req, res) => {
-    //tem que verificar se o client da venda é o mesmo que adiconou ao carrinho
+    
     try{
-        const {sale_id, client_id, medCode, quantity } = req.body;
-        
+        const {sale_id, client_id, medCode, item_qtd } = req.body;
+        const insertIntoSales = `INSERT INTO sales (
+            shopping_cart,
+            date_time,
+            payment_method,
+            sale_total,
+            client) 
+            VALUES ($1, $2, $3, $4, $5) RETURNING id`;
+        const pay_method = "nao_finalizada";
 
-        const cartItem = add_to_cart(medCode, quantity); //object containing id and total
-        const sellExists = await dbPool.query('SELECT EXISTS (SELECT 1 FROM sales WHERE id = $1', [sale_id])
+        const newItem = await insertNewCart_item(medCode, item_qtd);
+        cartItem_id = newItem.id
+        item_total = newItem.total;
         
-        if(sellExists.rows[0].exists){
-            await dbPool.query(
-                `UPDATE sales SET array_append(shopping_cart, $1) WHERE id = $2`, 
-                [cartItem.id, sale_id]
-            );
+        let sellExists = false;
+        if(sale_id != "" && sale_id != null && sale_id != undefined){
+            sellExists = ( await dbPool.query('SELECT EXISTS (SELECT 1 FROM sales WHERE id = $1)', [sale_id]) ).rows[0].exists
+        }
+        
+        if(sellExists){
+            await updateSales(cartItem_id, item_total, sale_id);
             res.status(OK).json( {'message': 'Medicamento adicionado ao carrinho!', 'sale_id': sale_id} );
         }else{
-
-            const new_sale_id = await dbPool.query(
-                `INSERT INTO sales(shopping_cart, date_time, payment_method, sale_total, client) 
-                VALUES($1, $2, $3, $4, $5) RETURNING id`,
-                [[cartItem.id], new Date(), pay_method, cartItem.total, client_id]
-            );
+            const new_sale_id = (await dbPool.query( insertIntoSales,
+                [ [cartItem_id], new Date(), pay_method, item_total, client_id ]
+            )).rows[0].id;
 
             res.status(OK).json( {'message': 'Medicamento adicionado ao carrinho!', 'sale_id': new_sale_id} );
         }
@@ -201,15 +242,6 @@ router.get('/verCarrinho', async (req, res) => {
 ID_de_venda = req.body.ID_de_venda
 item_para_add = req.body.itemPraAdd -> codigo do medicamento
 qtd_do_item = req.body
-
-if(ID_de_venda == true){
-    no banco, busca a venda com id
-    calcula o total e insere o resto dos dados, e gg
-}else{
-    cria um novo item e pega o id desse item
-    criar uma venda e add o id do item
-    finaliza venda
-}
 
 addCrrinho:
     ID_de_venda = req.body.ID_de_venda
@@ -248,21 +280,6 @@ router.post('/finalizarVenda', async (req, res) => {
         res.status(SERVER_ERR).send('Erro ao registrar venda. Verifique o log.');
     }
 });
-
-/* vender:
-ID_de_venda = req.body.ID_de_venda
-item_para_add = req.body.itemPraAdd -> codigo do medicamento
-qtd_do_item = req.body
-
-if(ID_de_venda == true){
-    no banco, busca a venda com id
-    calcula o total e insere o resto dos dados, e gg
-}else{
-    cria um novo item epega o id desse item
-    criar uma venda e add o id do item
-    finaliza venda
-}
-*/
 
 router.post('/fazerLogin', async (req, res) => {
 try{
@@ -315,7 +332,8 @@ try{
 });
 
 router.post('/cadastrarAdm', async (req, res) => {
-try{  
+try{
+    
     const manager = new UserManager(
         req.body.name,
         req.body.email,
@@ -339,8 +357,8 @@ try{
 
     if(err.code === '23505'){
         const match = err.detail.match(/Key \(([^)]+)\)=\(([^)]+)\)/);
-        const key = "";
-        const value= "";
+        let key = "";
+        let value= "";
         if (match) {
             key = match[1];
             value = match[2];
@@ -356,17 +374,6 @@ try{
 
 router.post("/cadastrarCli", async (req, res) => {
     try{
-
-        await dbPool.query(`CREATE TABLE IF NOT EXISTS client (
-            id SERIAL PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            cpf VARCHAR(11) NOT NULL UNIQUE,
-            email VARCHAR(255) NOT NULL UNIQUE,
-            password_hash VARCHAR(64) NOT NULL,
-            rg VARCHAR(7),
-            phone_number VARCHAR(14),
-            address TEXT 
-            )`);
 
         const registration = new UserClient(
             req.body.name,
@@ -412,8 +419,8 @@ router.post("/cadastrarCli", async (req, res) => {
 
         if(err.code === '23505'){
             const match = err.detail.match(/Key \(([^)]+)\)=\(([^)]+)\)/);
-            const key = "";
-            const value= "";
+            let key = "";
+            let value= "";
             if (match) {
                 key = match[1];
                 value = match[2];
