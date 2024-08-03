@@ -153,7 +153,7 @@ class UserClient extends User{
 
     validateRg(){
         switch(true){
-            case this.rg == "":
+            case this.rg == "" || this.rg == undefined:
                 this.rg = null;
                 break;
             case !/^[A-Z]{0,2}[0-9]{7,9}$/.test(this.rg):
@@ -166,7 +166,7 @@ class UserClient extends User{
     }
     validatePhone(){       
         switch(true){ 
-            case this.phone == "":
+            case this.phone == "" || this.phone == undefined:
                 this.phone = null;
                 break;
             case !/^\(?\d{2}\)?[\s-]?\d{4,5}-?\d{4}$/.test(this.phone):
@@ -179,7 +179,7 @@ class UserClient extends User{
     }
     validateAddress(){     
         switch(true){
-            case this.address == "":
+            case this.address == "" || this.address == undefined:
                 this.address = null;
                 break;
             case this.address.length < 5:

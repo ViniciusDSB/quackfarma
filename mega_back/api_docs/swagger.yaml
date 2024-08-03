@@ -35,8 +35,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
-                    type: string
                   sale_id:
                     type: integer
         '500':
@@ -64,10 +62,8 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
-                    type: string
                   id:
-                    type:
+                    type: integer
                   date_time:
                     type: timestamp
                   pay_method:
@@ -110,8 +106,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
-                    type: string
                   medicine_data:
                     type: array
                     items:
@@ -151,8 +145,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
-                    type: string
                   medicineList:
                     type: array
                     items:
@@ -262,13 +254,6 @@ paths:
       responses:
         "201":
           description: client registration created
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message: 
-                    type: string
                 
         "400":
           description: some data may be invalid, wrong sintax, characters, size etc
@@ -312,13 +297,6 @@ paths:
       responses:
         "201":
           description: manager registration created
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
         "400":
           description: some data may be invalid, wrong sintax, characters, size etc
           content:
@@ -362,8 +340,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
-                    type: string
                   is_adm:
                     type: boolean
                   email:
@@ -385,8 +361,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
-                    type: string
                   is_adm:
                     type: boolean
                   email:

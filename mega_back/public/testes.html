@@ -51,45 +51,41 @@
 </head>
 <body>
 
-    
     <div id="left">
         <h1>PAGINA DOS DEUSES</h1>
         <form action="/sendQuery" method="post">
             <textarea name="theQuery" placeholder="digite queries de SQL; mas tome cuidado, isso aqui vai direto sem validar nada :)"></textarea>
             <button type="submit">Send</button>
         </form>
-    
-        <form action="/cadastrarAdm" method="post">
-            <h2>Criar ADM</h2>
-            <input type="text" name="name" placeholder="Nome" >
-            <input type="email" name="email" placeholder="Email" >
-            <input type="password" name="password" placeholder="Senha" >
-            <input type="password" name="passwordRepeat" placeholder="Repita a senha" >
-            <button type="submit">Cadastar</button>
+
+        <h2>Apenas na tabela testes</h2>
+        <form action="/insert" method="post">
+            <h2>insert</h2><br>
+            <input type="text" name="nome" placeholder="nome"><br>
+            <input type="number" name="idade" placeholder="idade"><br>
+            <button type="submit">Salvar</button>
         </form>
     
-        <form action="/cadastrarCli" method="post">
-            <h2>Criar usuario</h2>
-            <input type="text" name="name" placeholder="Nome" >
-            <input type="text" name="cpf" placeholder="Cpf" >
-            <input type="email" name="email" placeholder="Email" >
-            <input type="password" name="password" placeholder="Senha" >
-            <input type="password" name="passwordRepeat" placeholder="Repita a enha" >
-            <input type="text" name="rg" placeholder="Rg">
-            <input type="text" name="address" placeholder="Endereco">
-            <input type="text" name="phone" placeholder="Telefone">
-            <button type="submit">Salvar</button>
-        </form><br>
+        <form action="/select" method="get">
+            <h2>select</h2><br>
+            <button type="submit">Mostrar salvos</button>
+        </form>
+    
+        <form action="/update" method="post">
+            <h2>update</h2>
+            <input type="text" name="nome" placeholder="Nome"><br>
+            <input type="text" name="novoNome" placeholder="Novo nome"><br>
+            <input type="number" name="idade" placeholder="idade"><br>
+            <button type="submit">Atualizar</button>
+        </form>
+        
+        <form action="/delete" method="post">
+            <input type="text" name="nome" placeholder="Nome para deletar"><br>
+            <button type="submit">Deletar</button>
+        </form>
     </div>
 
     <div id="middle">
-        <form action="/fazerLogin" method="post">
-            <h2>Fazer login</h2>
-            <input type="email" name="email" placeholder="email"><br>
-            <input type="password" name="password" placeholder="senha"><br>
-            <button type="submit">Logar</button>
-        </form>
-
         <form action="/cadastrarMedicamento" method="post" enctype="multipart/form-data">
             <h2>Adicionar ao estoque</h2>
             <input type="text" name="medName" placeholder="nome">
@@ -118,6 +114,38 @@
             <button type="submit">Buscar</button>
         </form>
 
+        <form action="/cadastrarAdm" method="post">
+            <h2>Criar ADM</h2>
+            <input type="text" name="name" placeholder="Nome" >
+            <input type="email" name="email" placeholder="Email" >
+            <input type="password" name="password" placeholder="Senha" >
+            <input type="password" name="passwordRepeat" placeholder="Repita a senha" >
+            <button type="submit">Cadastar</button>
+        </form>
+    </div>
+
+    <div id="right">
+        
+        <form action="/fazerLogin" method="post">
+            <h2>Fazer login</h2>
+            <input type="email" name="email" placeholder="email"><br>
+            <input type="password" name="password" placeholder="senha"><br>
+            <button type="submit">Logar</button>
+        </form>
+        
+        <form action="/cadastrarCli" method="post">
+            <h2>Criar usuario</h2>
+            <input type="text" name="name" placeholder="Nome" >
+            <input type="text" name="cpf" placeholder="Cpf" >
+            <input type="email" name="email" placeholder="Email" >
+            <input type="password" name="password" placeholder="Senha" >
+            <input type="password" name="passwordRepeat" placeholder="Repita a enha" >
+            <input type="text" name="rg" placeholder="Rg">
+            <input type="text" name="address" placeholder="Endereco">
+            <input type="text" name="phone" placeholder="Telefone">
+            <button type="submit">Salvar</button>
+        </form>
+
         <form action="/adicionarAoCarrinho" method="post">
             <h2>Adicionar produto no carrinho</h2>
             <input type="number" name="medCode" placeholder="Codigo do medicamento" required>
@@ -141,34 +169,7 @@
             <input type="number" name="clientId" placeholder="ID do Cliente" required>
             <button type="submit">Finalizar Venda</button>
         </form>
-    </div>
-
-    <div id="right">
-        <h2>Apenas na tabela testes</h2>
-        <form action="/insert" method="post">
-            <h2>insert</h2><br>
-            <input type="text" name="nome" placeholder="nome"><br>
-            <input type="number" name="idade" placeholder="idade"><br>
-            <button type="submit">Salvar</button>
-        </form><br>
-    
-        <form action="/select" method="get">
-            <h2>select</h2><br>
-            <button type="submit">Mostrar salvos</button>
-        </form><br>
-    
-        <form action="/update" method="post">
-            <h2>update</h2>
-            <input type="text" name="nome" placeholder="Nome"><br>
-            <input type="text" name="novoNome" placeholder="Novo nome"><br>
-            <input type="number" name="idade" placeholder="idade"><br>
-            <button type="submit">Atualizar</button>
-        </form><br>
         
-        <form action="/delete" method="post">
-            <input type="text" name="nome" placeholder="Nome para deletar"><br>
-            <button type="submit">Deletar</button>
-        </form>
     </div>
 </body>
 </html>
