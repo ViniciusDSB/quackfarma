@@ -98,9 +98,29 @@
 
             <input type="file" name="imageFile">
 
-            <input type="checkbox" name="needsRecipe"id="needRecipeCheckBox">
+            <input type="checkbox" name="needsRecipe" id="needRecipeCheckBox">
             <label for="needRecipeCheckBox">Precisa de receita?</label>
             <button type="submit">Salvar</button>
+        </form>
+
+        <form action="/medicamento" method="get">
+            <h2>Search for info</h2>
+            <input type="text" name="medName" placeholder="medName"> 
+            <input type="number" name="medCode" placeholder="medCode"> 
+            <input type="text" name="medCategory" placeholder="medCategory"> 
+            <input type="text" name="medDescription" placeholder="medDescription"> 
+            <input type="number" name="medUnitPrice" placeholder="medUnitPrice"> 
+            <input type="number" name="amountOnStock" placeholder="amountOnStock"> 
+            <input type="number" name="managerWhoAdded" placeholder="managerWhoAdded"> 
+            <input type="text" name="imagePath" placeholder="imagePath"> 
+            <input type="text" name="created_at" placeholder="created_at"> 
+            <input type="text" name="last_update" placeholder="last_update">
+
+            <input type="checkbox" name="needsRecipe" id="needRecipeCheckBox">
+            <label for="needRecipeCheckBox">Precisa de receita?</label>
+
+            <button type="submit">Manda brasa</button>
+
         </form>
 
         <form action="/listarMedicamentos" method="get">
