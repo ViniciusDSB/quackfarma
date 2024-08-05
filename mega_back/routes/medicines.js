@@ -3,7 +3,8 @@ const router = express.Router();
 const multer = require('multer');
 
 const dbPool = require('../dbConnection');
-const {DEFAULT_MESSAGE} = require("../myClasses");
+const {MedicineSearch, DEFAULT_MESSAGE} = require("../myClasses");
+const { query } = require('express');
 
 //http codes 
 const OK = 200;
@@ -89,6 +90,36 @@ router.post("/cadastrarMedicamento", uploadMedImages.single('imageFile'), async 
     }
 }
 });
+
+router.get('/medicamento', async (req, res) => {
+
+    try{
+        const { 
+            medName, 
+            medCode, 
+            medCategory, 
+            medDescription, 
+            medUnitPrice, 
+            amountOnStock, 
+            managerWhoAdded, 
+            imagePath, 
+            created_at, 
+            last_update 
+        } = req.query;
+        const needsRecipe = (req.query.needsRecipe == 'on' || req.query.needsRecipe == true ) ? true : false;
+      
+        const mkQuery = new MedicineSearch( medName, medCode, medCategory, medDescription, medUnitPrice, amountOnStock, managerWhoAdded, imagePath, needsRecipe, created_at, last_update );
+        const myQuery = mkQuery.buildQuery();
+
+        const data = await dbPool.query(myQuery.query, myQuery.values);
+        res.status(OK).json(data.rows);
+
+    }catch(err){
+        console.error('Erro na rota /medicamento', err);
+        res.status(SERVER_ERR).send('Erro ao mostrar produto. Verifique o log.');
+    }
+
+})
 
 router.get('/verMedicamento', async (req, res) => {
     try{

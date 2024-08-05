@@ -2,20 +2,130 @@ const DEFAULT_MESSAGE = "OK";
 
 class Medicine{
     constructor(medName, medCode, medCategory, medDescription, medUnitPrice, amountOnStock, managerWhoAdded, imagePath, needsRecipe){
-        this.name = medName 
-        this.code = medCode
-        this.category = medCategory
-        this.description = medDescription
-        this.unitPrice = medUnitPrice
-        this.amountOnStock = amountOnStock
-        this.managerWhoAdded = managerWhoAdded
-        this.imagePath = imagePath
-        this.needsRecipe = needsRecipe
+
+        if(medName == '' || medName == undefined){ this.medName = null }
+        else{this.medName = medName}
+
+        if(medCode == '' || medCode == undefined){ this.medCode = null }
+        else{this.medCode = medCode}
+
+        if(medCategory == '' || medCategory == undefined){ this.medCategory = null  }
+        else{this.medCategory = medCategory}
+
+        if(medDescription == '' || medDescription == undefined){ this.medDescription = null  }
+        else{this.medDescription = medDescription}
+
+        if(medUnitPrice == '' || medUnitPrice == undefined){ this.medUnitPrice = null }
+        else{this.medUnitPrice = medUnitPrice}
+
+        if(amountOnStock == '' || amountOnStock == undefined){ this.amountOnStock = null }
+        else{this.amountOnStock = amountOnStock}
+
+        if(managerWhoAdded == '' || managerWhoAdded == undefined){ this.managerWhoAdded = null }
+        else{this.managerWhoAdded = managerWhoAdded}
+
+        if(imagePath == '' || imagePath == undefined){ this.imagePath = null }
+        else{this.imagePath = imagePath}
+
+        if(needsRecipe === '' || needsRecipe == undefined){ this.needsRecipe = null}
+        else{this.needsRecipe = needsRecipe}
+
     }
 
     validadeData(){ 
         this.status = DEFAULT_MESSAGE;
     }
+}
+class MedicineSearch extends Medicine{
+
+    constructor(medName, medCode, medCategory, medDescription, medUnitPrice, amountOnStock, managerWhoAdded, imagePath, needsRecipe, created_at, last_update){
+        super(medName, medCode, medCategory, medDescription, medUnitPrice, amountOnStock, managerWhoAdded, imagePath, needsRecipe);
+
+        if(created_at == null || created_at == '' || created_at == undefined){this.created_at = null}
+        else{this.created_at = created_at}
+        
+        if(last_update == '' || last_update == undefined){this.last_update = null}
+        else{this.last_update = last_update}
+
+    }
+
+    searchQuery = `SELECT * FROM medications WHERE 1=1`;
+    queryValues = [];
+    buildQuery(){
+        
+        let paramCount = 0;
+
+        if(this.medName != null){
+            paramCount+=1;
+            this.searchQuery += ` AND name = $${paramCount}`;
+            this.queryValues.push(this.medName);
+        }
+
+        if(this.medCode != null){
+            paramCount+=1;
+            this.searchQuery += ` AND code = $${paramCount}`;
+            this.queryValues.push(this.medCode);
+        }
+
+        if(this.medCategory != null){
+            paramCount+=1;
+            this.searchQuery += ` AND category = $${paramCount}`;
+            this.queryValues.push(this.medCategory);
+        }
+
+        if(this.medDescription != null){
+            paramCount+=1;
+            this.searchQuery += ` AND description = $${paramCount}`;
+            this.queryValues.push(this.medDescription);
+        }
+  
+            
+        if(this.medUnitPrice != null){
+            paramCount+=1;
+            this.searchQuery += ` AND unit_price = $${paramCount}`;
+            this.queryValues.push(this.medUnitPrice);
+        }
+
+        if(this.amountOnStock != null){
+            paramCount+=1;
+            this.searchQuery += ` AND on_stock = $${paramCount}`;
+            this.queryValues.push(this.amountOnStock);
+        }
+
+        if(this.managerWhoAdded != null){
+            paramCount+=1;
+            this.searchQuery += ` AND manager = $${paramCount}`;
+            this.queryValues.push(this.managerWhoAdded);
+        }
+
+        if(this.imagePath != null){
+            paramCount+=1;
+            this.searchQuery += ` AND image_path = $${paramCount}`;
+            this.queryValues.push(this.imagePath);
+        }
+    
+        if(this.needsRecipe != null){
+            paramCount+=1;
+            this.searchQuery += ` AND needs_recipe = $${paramCount}`;
+            this.queryValues.push(this.needsRecipe);
+        }
+
+        if(this.created_at != null){
+            paramCount+=1;
+            this.searchQuery += ` AND created_at = $${paramCount}`;
+            this.queryValues.push(this.created_at);
+        }
+        
+        if(this.last_update != null){
+            paramCount+=1;
+            this.searchQuery += ` AND last_update = $${paramCount}`;
+            this.queryValues.push(this.last_update);
+        }
+
+        return {query: this.searchQuery, values: this.queryValues}
+
+    }
+    
 }
 
 class Login{
@@ -217,4 +327,4 @@ function VerificadorCpf(cpf) {
     return true;
 }
 
-module.exports = { Login, User, UserManager, UserClient, Medicine, DEFAULT_MESSAGE};
+module.exports = { Login, User, UserManager, UserClient, Medicine, MedicineSearch, DEFAULT_MESSAGE};
