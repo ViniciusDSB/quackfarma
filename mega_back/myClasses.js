@@ -1,132 +1,48 @@
 const DEFAULT_MESSAGE = "OK";
 
 class Medicine{
-    constructor(medName, medCode, medCategory, medDescription, medUnitPrice, amountOnStock, managerWhoAdded, imagePath, needsRecipe){
+    constructor(medName, medCode, medCategory, medDescription, medUnitPrice, amountOnStock, managerWhoAdded, imagePath, needsRecipe, created_at, last_update){
 
         if(medName == '' || medName == undefined){ this.medName = null }
-        else{this.medName = medName}
+        else{this.name = medName}
 
         if(medCode == '' || medCode == undefined){ this.medCode = null }
-        else{this.medCode = medCode}
+        else{this.code = medCode}
 
         if(medCategory == '' || medCategory == undefined){ this.medCategory = null  }
-        else{this.medCategory = medCategory}
+        else{this.category = medCategory}
 
         if(medDescription == '' || medDescription == undefined){ this.medDescription = null  }
-        else{this.medDescription = medDescription}
+        else{this.description = medDescription}
 
         if(medUnitPrice == '' || medUnitPrice == undefined){ this.medUnitPrice = null }
-        else{this.medUnitPrice = medUnitPrice}
+        else{this.unit_price = medUnitPrice}
 
         if(amountOnStock == '' || amountOnStock == undefined){ this.amountOnStock = null }
-        else{this.amountOnStock = amountOnStock}
+        else{this.on_stock = amountOnStock}
 
         if(managerWhoAdded == '' || managerWhoAdded == undefined){ this.managerWhoAdded = null }
-        else{this.managerWhoAdded = managerWhoAdded}
+        else{this.manager = managerWhoAdded}
 
         if(imagePath == '' || imagePath == undefined){ this.imagePath = null }
-        else{this.imagePath = imagePath}
+        else{this.image_path = imagePath}
 
         if(needsRecipe === '' || needsRecipe == undefined){ this.needsRecipe = null}
-        else{this.needsRecipe = needsRecipe}
-
-    }
-
-    validadeData(){ 
-        this.status = DEFAULT_MESSAGE;
-    }
-}
-class MedicineSearch extends Medicine{
-
-    constructor(medName, medCode, medCategory, medDescription, medUnitPrice, amountOnStock, managerWhoAdded, imagePath, needsRecipe, created_at, last_update){
-        super(medName, medCode, medCategory, medDescription, medUnitPrice, amountOnStock, managerWhoAdded, imagePath, needsRecipe);
+        else{this.needs_recipe = needsRecipe}
 
         if(created_at == null || created_at == '' || created_at == undefined){this.created_at = null}
         else{this.created_at = created_at}
         
         if(last_update == '' || last_update == undefined){this.last_update = null}
         else{this.last_update = last_update}
-
     }
 
-    searchQuery = `SELECT * FROM medications WHERE 1=1`;
-    queryValues = [];
-    buildQuery(){
-        
-        let paramCount = 0;
-
-        if(this.medName != null){
-            paramCount+=1;
-            this.searchQuery += ` AND name = $${paramCount}`;
-            this.queryValues.push(this.medName);
-        }
-
-        if(this.medCode != null){
-            paramCount+=1;
-            this.searchQuery += ` AND code = $${paramCount}`;
-            this.queryValues.push(this.medCode);
-        }
-
-        if(this.medCategory != null){
-            paramCount+=1;
-            this.searchQuery += ` AND category = $${paramCount}`;
-            this.queryValues.push(this.medCategory);
-        }
-
-        if(this.medDescription != null){
-            paramCount+=1;
-            this.searchQuery += ` AND description = $${paramCount}`;
-            this.queryValues.push(this.medDescription);
-        }
-  
-            
-        if(this.medUnitPrice != null){
-            paramCount+=1;
-            this.searchQuery += ` AND unit_price = $${paramCount}`;
-            this.queryValues.push(this.medUnitPrice);
-        }
-
-        if(this.amountOnStock != null){
-            paramCount+=1;
-            this.searchQuery += ` AND on_stock = $${paramCount}`;
-            this.queryValues.push(this.amountOnStock);
-        }
-
-        if(this.managerWhoAdded != null){
-            paramCount+=1;
-            this.searchQuery += ` AND manager = $${paramCount}`;
-            this.queryValues.push(this.managerWhoAdded);
-        }
-
-        if(this.imagePath != null){
-            paramCount+=1;
-            this.searchQuery += ` AND image_path = $${paramCount}`;
-            this.queryValues.push(this.imagePath);
-        }
-    
-        if(this.needsRecipe != null){
-            paramCount+=1;
-            this.searchQuery += ` AND needs_recipe = $${paramCount}`;
-            this.queryValues.push(this.needsRecipe);
-        }
-
-        if(this.created_at != null){
-            paramCount+=1;
-            this.searchQuery += ` AND created_at = $${paramCount}`;
-            this.queryValues.push(this.created_at);
-        }
-        
-        if(this.last_update != null){
-            paramCount+=1;
-            this.searchQuery += ` AND last_update = $${paramCount}`;
-            this.queryValues.push(this.last_update);
-        }
-
-        return {query: this.searchQuery, values: this.queryValues}
-
+    validadeData(){ 
+        this.status = DEFAULT_MESSAGE;
     }
-    
 }
+
+
 
 class Login{
     constructor(loginEmail, loginPassword){
@@ -228,7 +144,7 @@ class UserManager extends User{
 class UserClient extends User{
     constructor(name, cpf, email, password, passwordRepeat, rg, address, phone){
         super(name, email, password, passwordRepeat);
-        this.cpf = cpf;
+        this.cpf = cpf.replace(/\D/g, '');
         this.rg = rg;
         this.phone = phone;
         this.address = address;
@@ -246,11 +162,11 @@ class UserClient extends User{
             case this.cpf == "":
                 this.status = "CPF não pode ser vazio!";
                 break;
-            case !/^\d{11}$/.test(this.cpf): //Verifica se há 11 dígitos
-                this.status = "CPF inválido; Deve conter 11 digitos!";
+            case !/^(\d{3}\.\d{3}\.\d{3}-\d{2}|\d{11})$/.test(this.cpf): //Verifica se há 11 dígitos
+                this.status = "CPF inválido!";
                 break;
             case VerificadorCpf(this.cpf) == false:
-                this.status = "O CPF fotnecido é inválido!";
+                this.status = "O CPF fornecido é inválido!";
                 break;
             case /^(\d)\1{10}$/.test(this.cpf): //Verifica se os digitos não são todos iguais
                 this.status = "CPF inválido!";
@@ -327,4 +243,4 @@ function VerificadorCpf(cpf) {
     return true;
 }
 
-module.exports = { Login, User, UserManager, UserClient, Medicine, MedicineSearch, DEFAULT_MESSAGE};
+module.exports = { Login, User, UserManager, UserClient, Medicine, DEFAULT_MESSAGE};
