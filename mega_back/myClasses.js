@@ -144,7 +144,7 @@ class UserManager extends User{
 class UserClient extends User{
     constructor(name, cpf, email, password, passwordRepeat, rg, address, phone){
         super(name, email, password, passwordRepeat);
-        this.cpf = cpf ? cpf.replace(/\D/g, '') : null;
+        this.cpf = cpf;
         this.rg = rg;
         this.phone = phone;
         this.address = address;
@@ -158,22 +158,26 @@ class UserClient extends User{
     }
 
     validateCpf(){
-        switch(true){
-            case this.cpf == "" || this.cpf == undefined || this.cpf == null:
-                this.status = "CPF não pode ser vazio!";
-                break;
-            case !/^(\d{3}\.\d{3}\.\d{3}-\d{2}|\d{11})$/.test(this.cpf): //Verifica se há 11 dígitos
-                this.status = "CPF inválido!";
-                break;
-            case VerificadorCpf(this.cpf) == false:
-                this.status = "O CPF fornecido é inválido!";
-                break;
-            case /^(\d)\1{10}$/.test(this.cpf): //Verifica se os digitos não são todos iguais
-                this.status = "CPF inválido!";
-                break;
-            default:
-                this.validateRg();
-                break;
+        if(this.cpf == "" || this.cpf == undefined || this.cpf == null){
+            this.status = "CPF não pode ser vazio!";
+            return;
+        }else{
+            this.cpf = this.cpf.replace(/\D/g, '');
+
+            switch(true){
+                case !/^(\d{3}\.\d{3}\.\d{3}-\d{2}|\d{11})$/.test(this.cpf): //Verifica se há 11 dígitos
+                    this.status = "CPF inválido!";
+                    break;
+                case VerificadorCpf(this.cpf) == false:
+                    this.status = "O CPF fornecido é inválido!";
+                    break;
+                case /^(\d)\1{10}$/.test(this.cpf): //Verifica se os digitos não são todos iguais
+                    this.status = "CPF inválido!";
+                    break;
+                default:
+                    this.validateRg();
+                    break;
+            }
         }
     }
 

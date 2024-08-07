@@ -107,7 +107,7 @@ try{
 
 router.post("/cadastrarCli", async (req, res) => {
     try{
-
+        console.log("requested");
         const registration = new UserClient(
             req.body.name,
             req.body.cpf,
