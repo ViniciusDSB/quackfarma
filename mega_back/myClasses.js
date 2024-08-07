@@ -144,7 +144,7 @@ class UserManager extends User{
 class UserClient extends User{
     constructor(name, cpf, email, password, passwordRepeat, rg, address, phone){
         super(name, email, password, passwordRepeat);
-        this.cpf = cpf.replace(/\D/g, '');
+        this.cpf = cpf ? cpf.replace(/\D/g, '') : null;
         this.rg = rg;
         this.phone = phone;
         this.address = address;
@@ -159,7 +159,7 @@ class UserClient extends User{
 
     validateCpf(){
         switch(true){
-            case this.cpf == "":
+            case this.cpf == "" || this.cpf == undefined || this.cpf == null:
                 this.status = "CPF não pode ser vazio!";
                 break;
             case !/^(\d{3}\.\d{3}\.\d{3}-\d{2}|\d{11})$/.test(this.cpf): //Verifica se há 11 dígitos
