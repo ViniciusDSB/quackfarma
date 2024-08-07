@@ -209,6 +209,13 @@ paths:
                           type: string
         '404':
           description: Product not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:  
+                    type: string
         '500':
           description: server internal error
 

@@ -4,6 +4,7 @@ const multer = require('multer');
 
 const dbPool = require('../dbConnection');
 const {Medicine, DEFAULT_MESSAGE} = require("../myClasses");
+const { search } = require('./users');
 
 //http codes 
 const OK = 200;
@@ -114,14 +115,14 @@ class MedicineFinder{
             let searchQuery = ``;
             if(req.query.fields){
                 const fields = req.query.fields;
-                console.log(fields);
 
                 searchQuery= `SELECT ${fields} FROM medications WHERE 1=1`;
             }else{
                 searchQuery = `SELECT * FROM medications WHERE 1=1`;
             }
+            
             const medData = new Medicine( medName, medCode, medCategory, medDescription, medUnitPrice, amountOnStock, managerWhoAdded, imagePath, needsRecipe, created_at, last_update );
-    
+            
             let  queryValues = [];
 
             let paramCount = 0;
@@ -134,16 +135,17 @@ class MedicineFinder{
             })
 
             const data = await dbPool.query(searchQuery, queryValues);
-
-            if(data.count > 0){
+            if(data.rowCount > 0){
                 res.setHeader('Content-Type', 'application/json');
                 res.status(OK).json(data.rows);
             }else{
-                res.status(NOT_FOUND).send();
+                res.setHeader('Content-Type', 'application/json');
+                res.status(NOT_FOUND).json({message: "Nenhum medicamento encontrado :("});
             }
     
         }catch(err){
             console.error('Erro na rota /medicamento', err);
+            res.setHeader('Content-Type', 'application/json');
             res.status(SERVER_ERR).send('Erro ao mostrar produto. Verifique o log.');
         }
     }
