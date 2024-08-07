@@ -1,11 +1,6 @@
 mega_back/node_modules
-<<<<<<< HEAD
-mega_back/public/uploads/medicinesImg/*
-!mega_back/public/uploads/medicinesImg/defalutMed.png
-=======
 mega_back/public/uploads/medicines_images/*
 !mega_back/public/uploads/medicines_images/defalutMed.png
->>>>>>> devops
 
 mega_front/node_modules
 

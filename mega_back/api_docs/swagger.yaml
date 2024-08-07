@@ -88,19 +88,91 @@ paths:
         '500':
           description: server internal error
 
-  /verMedicamento/{medCode}:
+  /medicamento:
     get:
-      summary: Returns the information about a single product
+      summary: Returns specific data or all data about a procuct, depending on the url fields
       parameters:
-        - in: path
-          name: medCode
+        - in: query
+          name: fields
+          required: false
           schema:
+            type: string
+          description: >
+            - Fields list: id, name, code, category, description, needs_recipe, unit_price, on_stock, manager, image_path, created_at, last_update
+            - Values can be separeted by colons or percent-encoded(name, description or name%2ccode)
+        - in: query
+          name: medCode
+          required: false
+          schema:
+            type: string
+          description: "Filters by the required code, wtich is unique for each product"
+        - in: query
+          name: medName
+          required: false
+          schema:
+            type: string
+          description: "Filters by the specified name"
+        - in: query
+          name: medDescription
+          required: false
+          schema: 
+            type: string
+          description: "It is a filter used to get only the products that matches a description"
+        - in: query
+          name: medCategory
+          required: false
+          schema:
+            type: string
+          description: "It is a filter used to get only the produtcs that matches the required category"
+        - in: query
+          name: medUnitPrice
+          required: false
+          schema:
+            type: number
+          description: "Filters by the specified price"
+        - in: query
+          name: amountOnStock
+          required: false
+          schema: 
             type: integer
-          required: true
-          description: Four digit medicaton code
+          description: "Filters by the amount on stock"
+        - in: query
+          name: managerWhoAdded
+          required: false
+          schema: 
+            type: integer
+          description: "It filters producs by the id of the manager who added the product"
+        - in: query
+          name: imagePath
+          required: false
+          schema: 
+            type: string
+          description: "It is a filter used to get only the product that matches the required image_path"
+        - in: query
+          name: needsRecipe
+          required: false
+          schema: 
+            type: boolean
+          description: >
+            - if not specified it returns both, recipe required and not required
+            - else it returns products with required recipe only, or not required only
+        - in: query
+          name: created_at
+          required: false
+          schema: 
+            type: timestamp
+          description: "Filters by the date a product has been added"
+        - in: query
+          name: last_update
+          required: false
+          schema: 
+            type: timestamp
+          description: "Filters by the date a product has been updated"
       responses:
         '200':
-          description: products information sent
+          description: >
+            - A list of products with its data. It will return all data if no field is specified
+            - Ifd fields is specified it returns an an array with objects containeing only the requested data
           content:
             application/json:
               schema:
@@ -111,6 +183,8 @@ paths:
                     items:
                       type: object
                       properties:
+                        id:
+                          type: string 
                         name:
                           type: string
                         code:
@@ -123,45 +197,18 @@ paths:
                           type: number
                         needs_recipe:
                           type: boolean
-                        image_path:
-                          type: string
                         on_stock:
                           type: string
-        '400':
-          description: Error processing request
-        '404':
-          description: Product not found
-        '500':
-          description: server internal error
-
-  /listarMedicamentos:
-    get:
-      summary: Returs a list of products and it's basic information.
-      responses:
-        '200':
-          description: products list sent
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  medicineList:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        name:
+                        manager:
                           type: string
-                        code:
-                          type: string
-                        category:
-                          type: string
-                        description:
-                          type: string
-                        unit_price:
-                          type: number
                         image_path:
                           type: string
+                        created_at:
+                          type: string
+                        last_update:
+                          type: string
+        '404':
+          description: Product not found
         '500':
           description: server internal error
 

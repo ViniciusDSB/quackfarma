@@ -121,7 +121,6 @@ class MedicineFinder{
                 searchQuery = `SELECT * FROM medications WHERE 1=1`;
             }
             const medData = new Medicine( medName, medCode, medCategory, medDescription, medUnitPrice, amountOnStock, managerWhoAdded, imagePath, needsRecipe, created_at, last_update );
-            
     
             let  queryValues = [];
 
@@ -136,8 +135,12 @@ class MedicineFinder{
 
             const data = await dbPool.query(searchQuery, queryValues);
 
-            res.setHeader('Content-Type', 'application/json');
-            res.send(JSON.stringify(data.rows, null, 2));
+            if(data.count > 0){
+                res.setHeader('Content-Type', 'application/json');
+                res.status(OK).json(data.rows);
+            }else{
+                res.status(NOT_FOUND).send();
+            }
     
         }catch(err){
             console.error('Erro na rota /medicamento', err);
