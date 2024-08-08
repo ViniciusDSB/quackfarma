@@ -12,7 +12,7 @@
       <v-card-text>
         <v-form ref="form" class="mx-10">
           <div v-show="firstPage">
-            <v-text-field label="Nome" v-model="formData.nome" :rules="nameRules" class="background-color my-5 rounded-lg"
+            <v-text-field label="Nome" v-model="formData.name" :rules="nameRules" class="background-color my-5 rounded-lg"
                           hide-details="auto" required/>
             <v-text-field label="CPF" placeholder="000.000.000-00" v-model="formData.cpf" :rules="cpfRules"
                           hide-details="auto"
@@ -21,11 +21,11 @@
                           hide-details="auto" />
             <v-text-field label="E-mail" type="email" placeholder="seu_email@email.com" v-model="formData.email"
                           :rules="emailRules" required class="background-color my-5 rounded-lg" hide-details="auto"/>
-            <v-text-field label="Telefone" placeholder="(XX) XXXXX-XXXX" v-model="formData.telefone" maxlength="15"
+            <v-text-field label="Telefone" placeholder="(XX) XXXXX-XXXX" v-model="formData.phone" maxlength="15"
                           v-mask="['(##) #####-####']" class="background-color my-5 rounded-lg" hide-details="auto"
             />
             <v-text-field label="Endereço" hide-details="auto" class="background-color my-5 rounded-lg"
-                          v-model="formData.endereco"/>
+                          v-model="formData.address"/>
           </div>
         </v-form>
         <v-form ref="senhaForm" class="mx-10">
@@ -68,13 +68,17 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+  <AlertMessage ref="alerta"/>
 </template>
 
 <script>
 import {mask} from 'vue-the-mask'
-
+import AlertMessage from "@/components/alertas/AlertMessage.vue";
+import {createUser} from "@/services/UserService";
+import {emailRules} from "@/utils/rules";
 export default {
   name: 'CreateAccount',
+  components: {AlertMessage},
   directives: {mask},
   methods: {
     open() {
@@ -87,6 +91,15 @@ export default {
     rollback() {
       this.firstPage = true;
     },
+    async criarUsuario(){
+      try{
+        await createUser(this.formData)
+        this.$refs.alerta.sucess('Usuário criado com sucesso')
+        this.close()
+      }catch (error){
+        this.$refs.alerta.error(error.response.data.message)
+      }
+    },
     async continueBtn() {
       if (this.firstPage) {
         const {valid} = await this.$refs.form.validate()
@@ -96,15 +109,12 @@ export default {
       } else {
         const {valid} = await this.$refs.senhaForm.validate()
         if (valid) {
-          this.formData.senha = this.senha
-          this.close()
+          this.formData.password = this.senha;
+          this.formData.passwordRepeat = this.confirmarSenha;
+          await this.criarUsuario()
+
         }
       }
-    },
-    validateEmailInput(emailInput) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return emailRegex.test(emailInput);
-
     },
   },
   data() {
@@ -115,13 +125,14 @@ export default {
       senha: null,
       confirmarSenha: null,
       formData: {
-        nome: null,
+        name: null,
         cpf: null,
         email: null,
-        senha: null,
-        telefone: null,
+        password: null,
+        passwordRepeat : null,
+        phone: null,
         rg: null,
-        endereco: null
+        address: null
       },
       nameRules: [
         v => !!v || 'Nome é obrigatório',
@@ -131,10 +142,7 @@ export default {
         v => !!v || 'CPF é obrigatório',
         v => (v && v.length === 14) || 'CPF deve ter 11 caracteres',
       ],
-      emailRules: [
-        v => !!v || 'E-mail é obrigatório',
-        v => this.validateEmailInput(v) || 'Digite um email válido'
-      ],
+      emailRules: emailRules,
       senhaRules: [
         v => !!v || 'A senha deve ser preenchida',
         v => v.length >= 6 || 'Mínimo 6 caracteres',
