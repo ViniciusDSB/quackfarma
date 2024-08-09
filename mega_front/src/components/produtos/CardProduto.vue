@@ -3,13 +3,13 @@
   <v-container class="py-8 px-3" v-if="!loading">
     <v-row>
       <v-col>
-        <v-img  max-width="300"/>
+        <v-img  max-width="200" :src="product.image_path" max-height="200" class="rounded-lg mx-5"/>
       </v-col>
       <v-col>
-        <p class="text-h5">Nome</p>
-        <p class="text-subtitle-1">Código</p>
-        <p class="mt-6">Valor</p>
-        <v-btn rounded="lg"  block prepend-icon="mdi-shopping-search-outline" class="mt-14" color="#70A89E">
+        <p class="text-h5">{{product.name}}</p>
+        <p class="text-subtitle-1">{{product.code}}</p>
+        <p class="mt-6">{{product.unit_price}}</p>
+        <v-btn rounded="lg"  block prepend-icon="mdi-shopping-search-outline" @click="openProduct" class="mt-14" color="#70A89E">
           Ver mais
         </v-btn>
       </v-col>
@@ -35,9 +35,17 @@
 
 export default {
   name : 'CardProduto',
-  data () {
-    return {
-      loading : true
+  methods : {
+    openProduct(){
+      this.$router.push('/product/' + this.product.code)
+    }
+  },
+  props : {
+    product : {
+      default : null,
+    },
+    loading : {
+      default: true
     }
   }
 }

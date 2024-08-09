@@ -10,7 +10,7 @@ const routes = [
         component: Index
     },
     {
-        path : '/product/:id',
+        path : '/product/:medCode',
         name : 'Product',
         component: ProductDescription
     },

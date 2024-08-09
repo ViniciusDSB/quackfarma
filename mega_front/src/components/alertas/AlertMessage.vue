@@ -35,6 +35,11 @@ export default {
       this.timeout = 5000;
       this.message(message)
     },
+    warming(message){
+      this.color = 'warning';
+      this.timeout = 5000;
+      this.message(message)
+    },
     error(message){
       this.color = 'error';
       this.timeout = 7500;
