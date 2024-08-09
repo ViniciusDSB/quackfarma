@@ -8,9 +8,12 @@
           append-inner-icon="mdi-magnify"
           class="mx-16 background-color rounded-lg"
       ></v-text-field>
-      <v-sheet color="#A4E9C8" class="rounded-xl mx-16" >
-        <v-btn size="x-large" append-icon="mdi-account-circle-outline" @click="$refs.login.open()">
+      <v-sheet color="#A4E9C8" class="rounded-xl mx-16"  >
+        <v-btn v-if="!user.login" size="x-large" append-icon="mdi-account-circle-outline" @click="$refs.login.open()">
           Log in
+        </v-btn>
+        <v-btn size="x-large" v-else append-icon="mdi-account-circle-outline">
+          Olá {{user.firstName}}
         </v-btn>
       </v-sheet>
         <v-btn class="rounded-xl mx-16 pl-10 background-color" size="x-large"  prepend-icon="mdi-cart-outline"/>
@@ -28,13 +31,20 @@
 
 <script>
 import Login from "@/components/usuario/Login.vue";
+import User from "@/model/User";
+import {current} from "@/utils/memory";
 
 export default {
+  computed: {
+    user() {
+      return new User()
+    }
+  },
   components: {
     Login
   },
   name: 'App',
-  methods: {},
+  methods: {current},
   data() {
     return {
       categorias: [

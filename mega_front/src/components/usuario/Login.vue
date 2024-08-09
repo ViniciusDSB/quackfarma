@@ -57,6 +57,7 @@ import {login} from "@/services/UserService";
 import AlertMessage from "@/components/alertas/AlertMessage.vue";
 import Loading from "@/components/PagePrincipal/Loading.vue";
 import {emailRules} from "@/utils/rules";
+import User from "@/model/User";
 
 export default {
   name: 'LoginUsuario',
@@ -76,9 +77,13 @@ export default {
       }
       this.loading = true;
       try {
-        await login(this.email, this.password);
+        const response = await login(this.email, this.password);
         this.$refs.alerta.sucess('Login efetuado com sucesso')
+        let user = new User();
+        user.persistir(response.data)
         this.dialog = false
+        this.email = null;
+        this.password = null
       } catch (error) {
         this.$refs.alerta.error(error.response.data.message)
       } finally {
