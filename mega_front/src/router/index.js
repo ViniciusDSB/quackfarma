@@ -10,6 +10,11 @@ const routes = [
         component: Index
     },
     {
+        path: '/search',
+        name: 'Search',
+        component: Index
+    },
+    {
         path : '/product/:medCode',
         name : 'Product',
         component: ProductDescription
