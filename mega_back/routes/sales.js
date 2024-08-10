@@ -47,27 +47,40 @@ async function updateSales(cartItem_id, item_total, sale_id){
     await dbPool.query(updateSaleTotalQuery, [new_sale_total, sale_id]);
 }
 
+//if everything is fine retuns an obj with item total and its id
+//else, it return and obj with a message
 async function insertNewCart_item(medCode, item_qtd){
+    let itemObj = {}
+
     const insertIntoCart_item = `INSERT INTO cart_item (
         medicine_code,
         sold_amount,
         item_total,
         approval_status
         ) VALUES($1, $2, $3, $4) RETURNING id`;
-    const getMedPrice = `SELECT unit_price FROM medications WHERE code = $1`;
+    const getMedPrice = `SELECT on_stock, unit_price FROM medications WHERE code = $1`;
     const approval_status = false;
 
-    const med_price = (await dbPool.query( getMedPrice, [medCode] )).rows[0].unit_price;
+    let med_data = (await dbPool.query( getMedPrice, [medCode] ));
+    if( !(med_data.rowCount > 0) ){
+        itemObj = {message: "Medicamento não encontrado" };
+        return itemObj;
+    }
+    if( !( med_data .on_stock >= item_qtd ) ){
+        itemObj = {message: "Quantidade indisponível no estoque!" };
+        return itemObj;
+    }
+
+    const med_price = med_data.rows[0].unit_price
     let item_total = med_price * item_qtd;
+    let cartItem_id = (await dbPool.query(insertIntoCart_item,[medCode, item_qtd, item_total, approval_status])).rows[0].id;
 
-    const cartItem_id = (await dbPool.query(insertIntoCart_item,[medCode, item_qtd, item_total, approval_status])).rows[0].id;
-    const itemObj = {id: cartItem_id, total: item_total}
-
+    itemObj = { id: cartItem_id, total: item_total }
     return itemObj;
 }
 
 router.post('/adicionarAoCarrinho', async (req, res) => {
-    
+    //se o id for vazio retorna pedindo pra logar
     try{
         const {sale_id, client_id, medCode, item_qtd } = req.body;
         const insertIntoSales = `INSERT INTO sales (
@@ -77,21 +90,25 @@ router.post('/adicionarAoCarrinho', async (req, res) => {
             sale_total,
             client) 
             VALUES ($1, $2, $3, $4, $5) RETURNING id`;
-        const pay_method = "nao_finalizada";
+        const pay_method = "não_confirmada";
 
+        //cria um mnovo item de carrinho 
         const newItem = await insertNewCart_item(medCode, item_qtd);
-        cartItem_id = newItem.id
-        item_total = newItem.total;
+        if(newItem.message){
+            return res.status(BAD_REQUEST).json( {message: newItem.message} );
+        }
+        const cartItem_id = newItem.id
+        const item_total = newItem.total;
         
-        let sellExists = false;
+        let sellExists = false; //busca a venda no banco pelo id
         if(sale_id != "" && sale_id != null && sale_id != undefined){
             sellExists = ( await dbPool.query('SELECT EXISTS (SELECT 1 FROM sales WHERE id = $1)', [sale_id]) ).rows[0].exists
         }
         
-        if(sellExists){
+        if(sellExists){//se existir -> adicoina um novo item e retonsa o id da venda
             await updateSales(cartItem_id, item_total, sale_id);
             res.status(OK).json( {'sale_id': sale_id} );
-        }else{
+        }else{//caso não exista, cria uma e retorna seu id
             const new_sale_id = (await dbPool.query( insertIntoSales,
                 [ [cartItem_id], new Date(), pay_method, item_total, client_id ]
             )).rows[0].id;
@@ -106,6 +123,8 @@ router.post('/adicionarAoCarrinho', async (req, res) => {
 });
 
 router.post('/verCarrinho', async (req, res) => {
+    //verifica client id e essas coisas
+    //se tem itens, se tem carrinho, tu sabes
     try{
         const {sale_id, client_id } = req.body;
 
@@ -131,8 +150,6 @@ router.post('/verCarrinho', async (req, res) => {
 
         res.status(OK).json( { data });
 
-        //const produtos = await dbPool.query('SELECT medicine_code, sold_amount, item_total, approval_status FROM cart_item');
-        //res.status(OK).json( {'message': DEFAULT_MESSAGE, 'cart_list': produtos.rows} )
     }catch(err){
         console.error('Erro na rota /listarMedicamentos', err);
         res.status(SERVER_ERR).send('Erro ao encontrar produtos no carrinho. Verifique o log.');
