@@ -24,11 +24,12 @@ router.post('/fazerLogin', async (req, res) => {
         if(login.status === DEFAULT_MESSAGE){ 
             if( (await dbPool.query('SELECT EXISTS (SELECT 1 FROM client WHERE email = $1)', [login.email])).rows[0].exists ){
                 
-                const queryResult = await dbPool.query('SELECT name, cpf, rg, phone_number, address, password_hash FROM client WHERE email = $1', [login.email]);
+                const queryResult = await dbPool.query('SELECT id, name, cpf, rg, phone_number, address, password_hash FROM client WHERE email = $1', [login.email]);
     
                 if(sha256(`${login.password}`) == queryResult.rows[0].password_hash){//se senha esta correta
-                    res.status(ACCEPTED).json( 
-                        {   email: login.email, 
+                    res.status(ACCEPTED).json( {
+                            id: queryResult.rows[0].id,
+                            email: login.email, 
                             name: queryResult.rows[0].name, 
                             cpf: queryResult.rows[0].cpf, 
                             rg: queryResult.rows[0].rg, 
@@ -39,11 +40,12 @@ router.post('/fazerLogin', async (req, res) => {
                 }else{ res.status(UNAUTHORIZED).json( {message: "Senha incorreta!" } ); }
     
             }else if((await dbPool.query('SELECT EXISTS (SELECT 1 FROM managers WHERE email = $1)', [login.email])).rows[0].exists){
-                const queryResult = await dbPool.query('SELECT name, password_hash FROM managers WHERE email = $1', [login.email]);
+                const queryResult = await dbPool.query('SELECT id, name, password_hash FROM managers WHERE email = $1', [login.email]);
     
                 if(sha256(`${login.password}`) == queryResult.rows[0].password_hash){//se senha esta correta
-                    res.status(ACCEPTED_ADM).json( 
-                        {    email: login.email, 
+                    res.status(ACCEPTED_ADM).json( {   
+                            id: queryResult.rows[0].id,
+                            email: login.email, 
                             name: queryResult.rows[0].name,
                             is_adm: true
                         }
