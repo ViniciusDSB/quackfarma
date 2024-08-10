@@ -28,8 +28,8 @@ paths:
                 item_qtd:
                   type: integer
       responses: 
-        '200':
-          description: returns a success message and a sale_id to be stored in client
+        '201':
+          description: returns the sale_id to be stored in client and use for other sales operations
           content:
             application/json:
               schema:
@@ -37,6 +37,33 @@ paths:
                 properties:
                   sale_id:
                     type: integer
+        '400':
+          description: "medicamento não encontrado ou qtd mbçai informada/indisponível no estoque"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '401':
+          description: "Usuairo não logado"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '422':
+          description: "Id do cliente e não é o mesmo que consta na venda"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
         '500':
           description: server internal error
 
@@ -85,6 +112,24 @@ paths:
                           type: number
                         approval_status:
                           type: boolean
+        '401':
+          description: Usuario não está logado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: carrinho não foi encontrado; o id pode não existir, do carrinho ou do cliente na venda
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
         '500':
           description: server internal error
 
