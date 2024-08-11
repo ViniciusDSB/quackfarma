@@ -59,10 +59,11 @@
 
 <script>
 import {VNumberInput} from 'vuetify/labs/VNumberInput'
-import {seachUnit} from "@/services/productsService";
+import {addShopping, seachUnit} from "@/services/productsService";
 import Product from "@/model/Product";
 import AlertMessage from "@/components/alertas/AlertMessage.vue";
 import LoadingCircle from "@/components/PagePrincipal/Loading.vue";
+import User from "@/model/User";
 
 export default {
   name: 'ProductDescription',
@@ -76,16 +77,26 @@ export default {
   },
   data() {
     return {
-      loading : false,
+      loading: false,
       produto: new Product(),
       file: null,
-      qtd : 1
+      qtd: 1,
+      user: new User()
     }
   },
   methods: {
-    addCarrinho() {
+    async addCarrinho() {
       if (this.produto.needs_recipe && this.file == null) {
         this.$refs.alerta.warming('Produto precisa de receita médica.Por favor anexe')
+        return
+      }
+      try {
+        const response =  await addShopping(this.user.sale_id ?? '', parseInt(this.user.id), this.produto.code, this.qtd);
+        this.user.sale_id = response.data.sale_id
+        this.$refs.alerta.sucess('Produto adiconado no carrinho com sucesso')
+        await this.search()
+      } catch (error) {
+        this.$refs.alerta.error(error.response.data.message ?? error.message)
       }
 
     },
@@ -96,7 +107,7 @@ export default {
         this.produto.persistente(response.data[0])
       } catch (error) {
         this.$refs.alerta.error(error.response.data.message ?? error.message)
-      }finally {
+      } finally {
         this.loading = false
       }
     }

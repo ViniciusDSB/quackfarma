@@ -32,7 +32,6 @@
 <script>
 import Login from "@/components/usuario/Login.vue";
 import User from "@/model/User";
-import {current} from "@/utils/memory";
 
 export default {
   computed: {
@@ -44,7 +43,6 @@ export default {
     Login
   },
   name: 'App',
-  methods: {current},
   data() {
     return {
       categorias: [

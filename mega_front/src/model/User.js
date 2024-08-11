@@ -7,6 +7,8 @@ export default class User {
         this._rg = null
         this._phone_number = null
         this._is_adm = null
+        this._sale_id= null
+        this._id= null
     }
 
 
@@ -18,6 +20,7 @@ export default class User {
         this._rg = user.rg
         this._phone_number = user.phone_number
         this._is_adm = user.is_adm
+        this._id = user.id
         localStorage.setItem('login',this._login)
         localStorage.setItem('address',this._address)
         localStorage.setItem('name',this._name)
@@ -25,6 +28,8 @@ export default class User {
         localStorage.setItem('rg',this._rg)
         localStorage.setItem('is_adm',this._is_adm)
         localStorage.setItem('phone_number',this._phone_number)
+        localStorage.setItem('sale_id',this._sale_id)
+        localStorage.setItem('id',this._id)
     }
 
 
@@ -59,4 +64,21 @@ export default class User {
     get firstName(){
         return this.name.split(' ')[0]
     }
+
+    get sale_id(){
+        let sale =  localStorage.getItem('sale_id')
+        if(sale === 'null'){
+            return null
+        }
+        return sale
+    }
+
+    set sale_id(id){
+        localStorage.setItem('sale_id',id)
+    }
+
+    get id(){
+        return localStorage.getItem('id')
+    }
+
 }

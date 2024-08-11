@@ -9,3 +9,12 @@ export const searchProducts = async() =>  {
 export const seachUnit = async (codigo) => {
     return http.get('/medicamento?medCode=' + codigo)
 }
+
+export const addShopping = async (sale,clientId, medCode,qtd) =>{
+    return http.post('/adicionarAoCarrinho',{
+        'sale_id': sale,
+        'client_id': clientId,
+        'medCode': medCode,
+        'item_qtd': qtd
+    })
+}
