@@ -88,6 +88,7 @@ async function deleteItem(item_id){
 router.post('/adicionarAoCarrinho', async (req, res) => {
     try{
         res.header('Content-Type', 'application/json');
+        
         const {sale_id, client_id, medCode, item_qtd } = req.body;
         const pay_method = "não_confirmada";
 
@@ -141,6 +142,7 @@ router.post('/verCarrinho', async (req, res) => {
     //verifica client id e essas coisas
     //se tem itens, se tem carrinho, tu sabes
     res.header('Content-Type', 'application/json');
+    
     try{
         const {sale_id, client_id } = req.body;
 
@@ -181,6 +183,8 @@ router.post('/verCarrinho', async (req, res) => {
 
 router.post('/caixa', async (req, res) => {
     try{
+        res.header('Content-Type', 'application/json');
+        
         const { sale_id, pagamento, total, cliente } = req.body;
 
         const carrinho = await dbPool.query('SELECT EXISTS (SELECT 1 FROM sales WHERE id = $1', [sale_id]);
