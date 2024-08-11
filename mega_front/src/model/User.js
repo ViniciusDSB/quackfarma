@@ -21,6 +21,7 @@ export default class User {
         this._phone_number = user.phone_number
         this._is_adm = user.is_adm
         this._id = user.id
+        this._sale_id = user.sale_id
         localStorage.setItem('login',this._login)
         localStorage.setItem('address',this._address)
         localStorage.setItem('name',this._name)

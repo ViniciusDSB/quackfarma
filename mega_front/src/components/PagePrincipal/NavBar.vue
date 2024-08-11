@@ -16,7 +16,9 @@
           Olá {{user.firstName}}
         </v-btn>
       </v-sheet>
-        <v-btn class="rounded-xl mx-16 pl-10 background-color" size="x-large"  prepend-icon="mdi-cart-outline"/>
+        <v-btn class="rounded-xl mx-16 pl-10 background-color" size="x-large"
+               @click="this.$router.push('/shopping')"
+               prepend-icon="mdi-cart-outline"/>
 
     </v-toolbar>
     <v-tabs align-tabs="categorias" bg-color="#A4E9C8" fixed-tabs color="white">
