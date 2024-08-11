@@ -98,20 +98,29 @@
 
             <input type="file" name="imageFile">
 
-            <input type="checkbox" name="needsRecipe"id="needRecipeCheckBox">
+            <input type="checkbox" name="needsRecipe" id="needRecipeCheckBox">
             <label for="needRecipeCheckBox">Precisa de receita?</label>
             <button type="submit">Salvar</button>
         </form>
 
-        <form action="/listarMedicamentos" method="get">
-            <h2>Ver estoque</h2>
-            <button type="submit">Ver medicamentos</button>
-        </form>
+        <form action="/medicamento" method="get">
+            <h2>Search for info</h2>
+            <input type="text" name="medName" placeholder="medName"> 
+            <input type="number" name="medCode" placeholder="medCode"> 
+            <input type="text" name="medCategory" placeholder="medCategory"> 
+            <input type="text" name="medDescription" placeholder="medDescription"> 
+            <input type="number" name="medUnitPrice" placeholder="medUnitPrice"> 
+            <input type="number" name="amountOnStock" placeholder="amountOnStock"> 
+            <input type="number" name="managerWhoAdded" placeholder="managerWhoAdded"> 
+            <input type="text" name="imagePath" placeholder="imagePath"> 
+            <input type="text" name="created_at" placeholder="created_at"> 
+            <input type="text" name="last_update" placeholder="last_update">
 
-        <form action="/verMedicamento" method="get">
-            <h2>Buscar Medicamento</h2>
-            <input type="number" name="medCode" placeholder="meidicineCode">
-            <button type="submit">Buscar</button>
+            <input type="checkbox" name="needsRecipe" id="needRecipeCheckBox">
+            <label for="needRecipeCheckBox">Precisa de receita?</label>
+
+            <button type="submit">Manda brasa</button>
+
         </form>
 
         <form action="/cadastrarAdm" method="post">
@@ -148,8 +157,8 @@
 
         <form action="/adicionarAoCarrinho" method="post">
             <h2>Adicionar produto no carrinho</h2>
-            <input type="number" name="medCode" placeholder="Codigo do medicamento" required>
-            <input type="number" name="item_qtd" placeholder="Quantidade" required>
+            <input type="number" name="medCode" placeholder="Codigo do medicamento">
+            <input type="number" name="item_qtd" placeholder="Quantidade" >
             <input type="number" name="sale_id" placeholder="id da venda">
             <input type="number" name="client_id" placeholder="id do cliente">
             <button type="submit">Adicionar</button>
@@ -159,6 +168,9 @@
             <h2>Visualizar Carrinho</h2>
             <input type="number" name="sale_id" placeholder="id da venda">
             <input type="number" name="client_id" placeholder="id do cliente">
+            <input type="checkbox" name="operation" id="removeCart?">
+            <label for="removeCart?">Remover item do carrinho?</label>
+            <input type="number" name="item_id" placeholder="id do item">
             <button type="submit">Visualizar</button>
         </form>
 
