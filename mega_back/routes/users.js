@@ -18,35 +18,43 @@ const SERVER_ERR = 500;
 
 router.post('/fazerLogin', async (req, res) => {
     try{
+        res.header('Content-Type', 'application/json');
+        
         const login = new Login( req.body.email, req.body.password );
         login.validateData(); //apenas para validacao de formato, regex etc
     
         if(login.status === DEFAULT_MESSAGE){ 
             if( (await dbPool.query('SELECT EXISTS (SELECT 1 FROM client WHERE email = $1)', [login.email])).rows[0].exists ){
+
+                const clientDataQuery = 'SELECT id, name, cpf, rg, phone_number, address, password_hash FROM client WHERE email = $1';
+                const getUserSaleId = 'SELECT id FROM sales WHERE client = $1';
+
+                const clientData = await dbPool.query(clientDataQuery, [login.email]);
+                const sale_id = await dbPool.query(getUserSaleId, [clientData.rows[0].id]);
                 
-                const queryResult = await dbPool.query('SELECT id, name, cpf, rg, phone_number, address, password_hash FROM client WHERE email = $1', [login.email]);
-    
-                if(sha256(`${login.password}`) == queryResult.rows[0].password_hash){//se senha esta correta
+                if(sha256(`${login.password}`) == clientData.rows[0].password_hash){//se senha esta correta
                     res.status(ACCEPTED).json( {
-                            id: queryResult.rows[0].id,
-                            email: login.email, 
-                            name: queryResult.rows[0].name, 
-                            cpf: queryResult.rows[0].cpf, 
-                            rg: queryResult.rows[0].rg, 
-                            address: queryResult.rows[0].address, 
-                            phone_number: queryResult.rows[0].phone_number, 
-                            is_adm: false}
+                            id: clientData.rows[0].id,
+                            email: login.email,
+                            name: clientData.rows[0].name,
+                            cpf: clientData.rows[0].cpf,
+                            rg: clientData.rows[0].rg,
+                            address: clientData.rows[0].address,
+                            phone_number: clientData.rows[0].phone_number,
+                            sale_id: sale_id.rows[0].id,
+                            is_adm: false
+                        }
                     );
                 }else{ res.status(UNAUTHORIZED).json( {message: "Senha incorreta!" } ); }
     
             }else if((await dbPool.query('SELECT EXISTS (SELECT 1 FROM managers WHERE email = $1)', [login.email])).rows[0].exists){
-                const queryResult = await dbPool.query('SELECT id, name, password_hash FROM managers WHERE email = $1', [login.email]);
+                const clientData = await dbPool.query('SELECT id, name, password_hash FROM managers WHERE email = $1', [login.email]);
     
-                if(sha256(`${login.password}`) == queryResult.rows[0].password_hash){//se senha esta correta
+                if(sha256(`${login.password}`) == clientData.rows[0].password_hash){//se senha esta correta
                     res.status(ACCEPTED_ADM).json( {   
-                            id: queryResult.rows[0].id,
+                            id: clientData.rows[0].id,
                             email: login.email, 
-                            name: queryResult.rows[0].name,
+                            name: clientData.rows[0].name,
                             is_adm: true
                         }
                     );
@@ -68,7 +76,8 @@ router.post('/fazerLogin', async (req, res) => {
     
 router.post('/cadastrarAdm', async (req, res) => {
 try{
-    
+    res.header('Content-Type', 'application/json');
+
     const manager = new UserManager(
         req.body.name,
         req.body.email,
@@ -109,6 +118,8 @@ try{
 
 router.post("/cadastrarCli", async (req, res) => {
     try{
+        res.header('Content-Type', 'application/json');
+
         console.log("requested");
         const registration = new UserClient(
             req.body.name,
