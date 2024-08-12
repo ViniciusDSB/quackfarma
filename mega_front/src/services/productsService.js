@@ -18,3 +18,10 @@ export const addShopping = async (sale,clientId, medCode,qtd) =>{
         'item_qtd': qtd
     })
 }
+
+export const searchShopping = async (saleId,clientId) => {
+    return http.post('/verCarrinho',{
+        'sale_id': saleId,
+        'client_id' : clientId
+    })
+}
