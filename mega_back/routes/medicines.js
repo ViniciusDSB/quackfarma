@@ -16,7 +16,6 @@ const UNAUTHORIZED = 401;
 const NOT_FOUND = 404;
 const SERVER_ERR = 500;
 
-
 //ADICIONA RNOVO MEDICAMENTO
 const uploadMedImages = multer( {dest: './public/uploads/medicines_images/'} );
 router.post("/cadastrarMedicamento", uploadMedImages.single('imageFile'), async (req, res) => {
@@ -26,7 +25,7 @@ router.post("/cadastrarMedicamento", uploadMedImages.single('imageFile'), async 
     
         const medImage = req.file;
         if(!medImage)
-            return res.status(BAD_REQUEST).json( {'message': 'Campo de imagem não fora preenchido!'});
+            return res.status(BAD_REQUEST).json( {'message': 'Campo de imagem não foi preenchido!'});
         
         if(!/^image/.test(medImage.mimetype))
             return res.status(BAD_REQUEST).json( {'message': 'O arquivo não é uma imagem!'});
@@ -96,26 +95,32 @@ router.post("/cadastrarMedicamento", uploadMedImages.single('imageFile'), async 
 });
 
 //ALTERA OS DADOS DE UM MEDICAMENTO
-//class AlterMedications{
+//async function updateMedication(){}
+//async function deleteMedication(){}
 //
-//    static async alterMedications(req, res){
-//        try{
-//            const params = req.body;
+//router.post('/editar', async (req, res) => {
 //
-//            if(params.lenght == 0){
-//                return res.status(BAD_REQUEST).json( message: "Dados não recebidos!" );
-//            }
-//
-//            for(const [key, value] of Object.entries(params)){
-//                
-//            }
-//
-//        }catch(err){
-//    
+//    try{
+//        const params = req.body;
+//        //params = {admId, medicationCode, [other medicatoin params need to update]}
+//        if(params.lenght == 0){
+//            return res.status(BAD_REQUEST).json({ message: "Dados não recebidos!" });
 //        }
+//
+//        const getAdmDataQuery = 'SELECT * FROM mnagers WHERE id = $1';
+//        const adData = await dbPool.query(getAdmDataQuery, [params.admId]);
+//        if(params.admId == adm_id){
+//
+//        }
+//        //for(const [key, value] of Object.entries(params)){
+//        //    
+//        //}
+//
+//    }catch(err){
+//
 //    }
-//}
-//router.post('/editar', AlterMedications.alterMedications);
+//
+//});
 
 //BUSCAR MEDICAMENTO
 class MedicineFinder{
