@@ -11,11 +11,11 @@ paths:
 
   /adicionarAoCarrinho:
     post:
-      summary: Adds a new item to a shopping list and starts a new sale if not exists, returning a sale_id
+      summary: adiciona novo item a uma venda e retorna o id da venda, ainda não finalizada
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -27,9 +27,12 @@ paths:
                   type: integer
                 item_qtd:
                   type: integer
+                recipeFile:
+                  type: string
+                  format: binary
       responses: 
         '201':
-          description: returns the sale_id to be stored in client and use for other sales operations
+          description: retorna o id da venda para ser usado para operações posteriorees (consultar carrinho, add mais itens, finalizar venda)
           content:
             application/json:
               schema:
@@ -38,7 +41,7 @@ paths:
                   sale_id:
                     type: integer
         '400':
-          description: "medicamento não encontrado ou qtd mbçai informada/indisponível no estoque"
+          description: "medicamento não encontrado ou qtd não informada/indisponível no estoque"
           content:
             application/json:
               schema:
@@ -111,7 +114,9 @@ paths:
                         item_total:
                           type: number
                         approval_status:
-                          type: boolean
+                          type: string
+                        recipe_path:
+                          type: string
         '401':
           description: Usuario não está logado
           content:
@@ -270,7 +275,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -288,8 +293,9 @@ paths:
                   type: number
                 managerWhoAdded:
                   type: number #manager id
-                imagePath:
+                imageFile:
                   type: string
+                  format: binary
                 needRecipe:
                   type: boolean
       responses:

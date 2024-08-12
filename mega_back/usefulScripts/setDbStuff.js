@@ -146,12 +146,32 @@ async function setMedications(){
 }
 
 async function setCart_item(){
-  await dbPool.query(`CREATE TABLE IF NOT EXISTS cart_item(
-                    id SERIAL PRIMARY KEY,
-                    medicine_code INTEGER REFERENCES medications(code) ON DELETE CASCADE NOT NULL,
-                    sold_amount INTEGER NOT NULL,
-                    item_total NUMERIC(10, 2) NOT NULL,
-                    approval_status BOOLEAN NOT NULL)`);
+  await dbPool.query(`
+    DO $$
+    BEGIN
+        IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'cart_item') THEN
+            BEGIN
+                ALTER TABLE cart_item
+                ADD COLUMN IF NOT EXISTS recipe_path TEXT;
+                
+                ALTER TABLE cart_item
+                ALTER COLUMN approval_status TYPE VARCHAR(16);
+                
+                ALTER TABLE cart_item
+                ALTER COLUMN approval_status SET NOT NULL;
+            END;
+        END IF;
+    END $$;
+  `);
+  await dbPool.query(`
+    CREATE TABLE IF NOT EXISTS cart_item(
+    id SERIAL PRIMARY KEY,
+    medicine_code INTEGER REFERENCES medications(code) ON DELETE CASCADE NOT NULL,
+    sold_amount INTEGER NOT NULL,
+    item_total NUMERIC(10, 2) NOT NULL,
+    recipe_path TEXT,
+    approval_status VARCHAR(16) NOT NULL
+  )`); //approval_status can be: approved, wating or not approved
   console.log("Cart_item ok");
 }
 
@@ -162,7 +182,9 @@ async function setSales(){
                     date_time TIMESTAMP NOT NULL,
                     payment_method VARCHAR(16),
                     sale_total NUMERIC(10, 2) NOT NULL,
-                    client INTEGER REFERENCES client(id) ON DELETE CASCADE NOT NULL)`);
+                    client INTEGER REFERENCES client(id) ON DELETE CASCADE NOT NULL,
+                    status BOOLEAN NOT NULL
+                    )`);
   console.log("Sales ok");
 }
 
