@@ -39,6 +39,7 @@ async function setClientTable(){
 async function setMedications(){
     
   await dbPool.query('DROP TABLE IF EXISTS medicines');
+  await dbPool.query('UPDATE medications SET image_path = $1', ["http://localhost:3001/uploads/medicines_images/defaultMed.png"]);
   await dbPool.query(`CREATE TABLE IF NOT EXISTS medications(
       id SERIAL PRIMARY KEY,
       name VARCHAR(255) NOT NULL,

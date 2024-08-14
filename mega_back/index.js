@@ -11,12 +11,21 @@ setupDatabase();
 const basicRoutes = require("./routes/tests.js");
 const userRoutes = require("./routes/users.js");
 const medicineRoutes = require("./routes/medicines.js");
-const salesRoutes = require("./routes/sales.js");
+
+//sales operations (finish sale, add/remove from cart, see it)
+const addToCart = require("./routes/salesAndCart/addToCart.js");
+const deleteSale = require("./routes/salesAndCart/delSaleOrItem.js");
+const finishSale = require("./routes/salesAndCart/finishSale.js");
+const seeCart = require("./routes/salesAndCart/seeCart.js");
 
 app.use("/", basicRoutes);
 app.use("/", userRoutes);
 app.use("/", medicineRoutes);
-app.use("/",salesRoutes);
+
+app.use("/", addToCart);
+app.use("/", deleteSale);
+app.use("/", finishSale);
+app.use("/", seeCart);
 
 const dbPool = require('./dbConnection');
 app.get('/', async (req, res) => {

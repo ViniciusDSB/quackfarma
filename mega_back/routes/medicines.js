@@ -8,7 +8,7 @@ const { search } = require('./users');
 
 //http codes 
 const OK = 200;
-const CREATED = 201;
+const SUCCESS = 204;
 const ACCEPTED = 202;
 const ACCEPTED_ADM = 209;
 const BAD_REQUEST = 400;
@@ -72,7 +72,7 @@ router.post("/cadastrarMedicamento", uploadMedImages.single('imageFile'), async 
                     new Date(), new Date()
                 ]);
                 
-            res.status(CREATED).json( {'message': 'Medicamento adicionado ao estoque!'} );
+            res.status(SUCCESS).send();
         }else{
             res.status(BAD_REQUEST).json( {'message': medicine.status} );
         }

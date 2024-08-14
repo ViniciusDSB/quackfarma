@@ -9,6 +9,47 @@ servers:
 - url: http://localhost:3001
 paths:
 
+  /apagar:
+    post:
+      summary: >
+        - se recer apena so sale_id então deleta a venda e todo o seu carrinho;  
+        - se receber um sale_id e um item_id então deleta apenas este item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sale_id:
+                  type: integer
+                item_id:
+                  type: integer
+      responses: 
+        '204':
+          description: se der certo retorna sucesso e nada mais
+        '400':
+          description: Falta de parametros na requisição o problema inesperado, restorna mensagem de erro
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: se um item ou venda não foi encontrada para ser deletada retorna a mensagem de erro
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: erro interno do servidor
+          
+
   /adicionarAoCarrinho:
     post:
       summary: adiciona novo item a uma venda e retorna o id da venda, ainda não finalizada
@@ -68,7 +109,7 @@ paths:
                   message:
                     type: string
         '500':
-          description: server internal error
+          description: erro interno do servidor
 
   /verCarrinho:
     post:
@@ -136,7 +177,7 @@ paths:
                   id:
                     type: integer
         '500':
-          description: server internal error
+          description: erro interno do servidor
 
   /medicamento:
     get:
@@ -267,7 +308,7 @@ paths:
                   message:  
                     type: string
         '500':
-          description: server internal error
+          description: erro interno do servidor
 
   /cadastrarMedicamento:
     post:
@@ -327,7 +368,7 @@ paths:
                   message:
                     type: string
         '500':
-          description: server internal error
+          description: erro interno do servidor
 
 
   /cadastrarCli:
@@ -379,7 +420,7 @@ paths:
                   message:
                     type: string
         "500":
-          description: server internal error
+          description: erro interno do servidor
 
   /cadastrarAdm:
     post:
@@ -421,7 +462,7 @@ paths:
                   message:
                     type: string
         "500":
-          description: server internal error
+          description: erro interno do servidor
   
   /fazerLogin:
     post:
@@ -505,4 +546,4 @@ paths:
                   message:
                     type: string
         "500":
-          description: server internal error
+          description: erro interno do servidor

@@ -1,7 +1,7 @@
 mega_back/node_modules
 mega_back/public/uploads/medicines_images/*
 !mega_back/public/uploads/medicines_images/defalutMed.png
-mega_back/public/uploads/recipes/
+mega_back/public/uploads/recipes/*
 
 mega_front/node_modules
 
