@@ -1,3 +1,4 @@
+// @ts-check
 const {app, express} = require('../../expressApp');
 const router = express.Router();
 const multer = require('multer');
@@ -28,28 +29,18 @@ function deleteFile(filePath){
       });
 }
 
-
-const appendToSalesCart = `UPDATE sales SET shopping_cart = array_append(shopping_cart, $1) WHERE id = $2`;
-const getSaleTotalQuery = `SELECT sale_total FROM sales WHERE id = $1`;
-const updateSaleTotalQuery = `UPDATE sales SET sale_total = $1 WHERE id = $2`
+//const appendToSalesCart = ``;
+//const getSaleTotalQuery = `SELECT sale_total FROM sales WHERE id = $1`;
+const updateSaleTotalQuery = `UPDATE sales SET sale_total = sale_total + $1 WHERE id = $2`
 
 const getMedData = `SELECT needs_recipe, on_stock, unit_price FROM medications WHERE code = $1`;
 
-const insertIntoCart_item = `INSERT INTO cart_item (
-    medicine_code,
-    sold_amount,
-    item_total,
-    recipe_path,
-    approval_status
-    ) VALUES($1, $2, $3, $4, $5) RETURNING id`;
-
-async function updateSales(cartItem_id, item_total, sale_id){
-    
-    let currentSaleTotal = ( await dbPool.query( getSaleTotalQuery, [sale_id]) ).rows[0].sale_total;
-    const new_sale_total = parseFloat(currentSaleTotal) + parseFloat(item_total)
-    
-    await dbPool.query( appendToSalesCart, [cartItem_id, sale_id]);
-    await dbPool.query(updateSaleTotalQuery, [new_sale_total, sale_id]);
+async function updateSales(item_total, sale_id){
+    console.log("AAAAAAA");
+    console.log(item_total);
+    console.log(sale_id);
+    item_total = parseFloat(item_total);
+    await dbPool.query(updateSaleTotalQuery, [item_total, sale_id]);
 }
 
 //if everything is fine retuns an obj with item total and its id
@@ -73,7 +64,17 @@ function validateUpload(recipe_file, needs_recipe){
         return {'url': recipeUrl}
     } 
 }
-async function insertNewCart_item(medCode, item_qtd, recipe_file){
+
+const insertIntoCart_item = `INSERT INTO cart_item (
+    medicine_code,
+    sold_amount,
+    item_total,
+    recipe_path,
+    approval_status,
+    sale_id
+    ) VALUES($1, $2, $3, $4, $5, $6) RETURNING id`;
+
+async function insertNewCart_item(sale_id, medCode, item_qtd, recipe_file){
     let itemObj = {}
     let approval_status = 'reprovada'; //can be: aprovada, revisando or reprovada
 
@@ -110,7 +111,15 @@ async function insertNewCart_item(medCode, item_qtd, recipe_file){
 
 //insere no banco com todos os dados
     let cartItem_id = (await dbPool.query(insertIntoCart_item,
-        [medCode, item_qtd, item_total, recipeUrl, approval_status])).rows[0].id;
+        [
+            medCode, 
+            item_qtd, 
+            item_total, 
+            recipeUrl, 
+            approval_status, 
+            sale_id
+        ])).rows[0].id;
+
     itemObj = { id: cartItem_id, total: item_total }
     return itemObj;
 }
@@ -144,6 +153,7 @@ router.post('/adicionarAoCarrinho', uploadRecipe.single('recipeFile'), async (re
         
         const {sale_id, client_id, medCode, item_qtd } = req.body;
         const pay_method = "não_confirmada";
+        const recipe_file = req.file; //guarda os dados do upload
 
         if(client_id == undefined || client_id == ''){
             return res.status(UNAUTHORIZED).json( {message: "Usuario não logado!"} );
@@ -154,15 +164,6 @@ router.post('/adicionarAoCarrinho', uploadRecipe.single('recipeFile'), async (re
         if(item_qtd == 0 || item_qtd == undefined || item_qtd == ''){
             return res.status(BAD_REQUEST).json( {message: "Quantidade do medicamento não informada!"} );
         }
-       
-    //cria um novo item de carrinho e verifica se deu erro
-        const recipe_file = req.file; //parece que isso faz o upload
-        const newItem = await insertNewCart_item(medCode, item_qtd, recipe_file);
-        if(newItem.message){
-            return res.status(BAD_REQUEST).json( {message: newItem.message} );
-        }
-        const cartItem_id = newItem.id
-        const item_total = newItem.total;
         
     //busca a venda no banco pelo id
         let sellExists = {}; 
@@ -170,31 +171,37 @@ router.post('/adicionarAoCarrinho', uploadRecipe.single('recipeFile'), async (re
             sellExists = ( await dbPool.query('SELECT client FROM sales WHERE id = $1', [sale_id]) );
         }
         
-    //se existir -> adicoina um novo item e retorna o id da venda
+    //se a venda existir -> adicoina um novo item e retorna o id da venda
         if(sellExists.rowCount > 0 && sellExists.rows[0].client == client_id){
-            await updateSales(cartItem_id, item_total, sale_id);
-            res.status(CREATED).json( {'sale_id': sale_id} );
+            const newItem = await insertNewCart_item(sale_id, medCode, item_qtd, recipe_file);
+
+            if(newItem.message){
+                return res.status(BAD_REQUEST).json( {message: newItem.message} );
+            }else{
+                await updateSales(newItem.total, sale_id);
+                return res.status(CREATED).json( {'sale_id': sale_id} );
+            }
     
-        }//caso a venda existe mas não pertence a esse client
+        }//caso a venda exista mas não pertence a esse client
         else if(sellExists.rowCount > 0 && sellExists.rows[0].client != client_id){
-            await dbPool.query(`DELETE FROM cart_item WHERE id = $1`, [cartItem_id]);
             res.status(UNPROCESSABLE_CONTENT).json( {message: "O carrinho não pertence a este usuário"} );
 
         }//caso não exista, cria uma e retorna seu id
         else{
             const insertIntoSales = `INSERT INTO sales (
-                shopping_cart,
                 date_time,
                 payment_method,
                 sale_total,
                 client,
                 status
-                )VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`;
+                )VALUES ($1, $2, $3, $4, $5) RETURNING id`;
 
             const new_sale_id = (await dbPool.query( insertIntoSales,
-                [ [cartItem_id], new Date(), pay_method, item_total, client_id, false]
+                [ new Date(), pay_method, 0, client_id, false]
             )).rows[0].id;
 
+            const newItem = await insertNewCart_item(new_sale_id, medCode, item_qtd, recipe_file);
+            await updateSales(newItem.total, new_sale_id);
             res.status(CREATED).json( {'sale_id': new_sale_id} );
         }
     

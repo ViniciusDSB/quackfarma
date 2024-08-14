@@ -164,6 +164,19 @@ async function setCart_item(){
         END IF;
     END $$;
   `);
+
+  await dbPool.query(`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'cart_item' AND column_name = 'sale_id') THEN
+        BEGIN
+          ALTER TABLE cart_item
+          ADD COLUMN sale_id INTEGER REFERENCES sales(id) ON DELETE CASCADE NOT NULL;
+        END;
+      END IF;
+    END $$;
+    `);
+
   await dbPool.query(`
     CREATE TABLE IF NOT EXISTS cart_item(
     id SERIAL PRIMARY KEY,
@@ -171,21 +184,33 @@ async function setCart_item(){
     sold_amount INTEGER NOT NULL,
     item_total NUMERIC(10, 2) NOT NULL,
     recipe_path TEXT,
-    approval_status VARCHAR(16) NOT NULL
+    approval_status VARCHAR(16) NOT NULL,
+    sale_id INTEGER REFERENCES sales(id) ON DELETE CASCADE NOT NULL
   )`); //approval_status can be: approved, wating or not approved
   console.log("Cart_item ok");
 }
 
 async function setSales(){
-  await dbPool.query(`CREATE TABLE IF NOT EXISTS sales(
-                    id SERIAL PRIMARY KEY,
-                    shopping_cart INTEGER[] NOT NULL,
-                    date_time TIMESTAMP NOT NULL,
-                    payment_method VARCHAR(16),
-                    sale_total NUMERIC(10, 2) NOT NULL,
-                    client INTEGER REFERENCES client(id) ON DELETE CASCADE NOT NULL,
-                    status BOOLEAN NOT NULL
-                    )`);
+  await dbPool.query(`
+    DO $$
+    BEGIN 
+      IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'sales' AND column_name = 'shopping_cart') THEN
+        BEGIN 
+          ALTER TABLE sales DROP COLUMN shopping_cart;
+        END;
+      END IF;
+    END $$
+  `);
+
+  await dbPool.query(`
+    CREATE TABLE IF NOT EXISTS sales(
+      id SERIAL PRIMARY KEY,
+      date_time TIMESTAMP NOT NULL,
+      payment_method VARCHAR(16),
+      sale_total NUMERIC(10, 2) NOT NULL,
+      client INTEGER REFERENCES client(id) ON DELETE CASCADE NOT NULL,
+      status BOOLEAN NOT NULL
+      )`);
   console.log("Sales ok");
 }
 

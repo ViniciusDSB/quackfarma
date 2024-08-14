@@ -8,11 +8,8 @@ const { DEFAULT_MESSAGE } = require("../../myClasses");
 
 //http codes 
 const OK = 200;
-const CREATED = 201;
-const BAD_REQUEST = 400;
 const UNAUTHORIZED = 401;
 const NOT_FOUND = 404;
-const UNPROCESSABLE_CONTENT = 422;
 const SERVER_ERR = 500;
 
 router.post('/verCarrinho', async (req, res) => {
@@ -21,10 +18,8 @@ router.post('/verCarrinho', async (req, res) => {
     res.header('Content-Type', 'application/json');
     
     try{
-        const {sale_id, client_id } = req.body;
+        const {sale_id, client_id} = req.body;
 
-        const findSaleQuery = `SELECT * FROM sales WHERE id = $1 AND client = $2`;
-        const findItemsQuery = `SELECT * FROM cart_item WHERE id = $1`;
         if(!client_id){
             return res.status(UNAUTHORIZED).json( {message: "Usuairo deve estar logado!"} );
         }
@@ -32,17 +27,15 @@ router.post('/verCarrinho', async (req, res) => {
             return res.status(UNAUTHORIZED).json( {message: "Id da venda deve ser informado"} );
         }
 
+        const findSaleQuery = `SELECT * FROM sales WHERE id = $1 AND client = $2`;
+        const findItemsQuery = `SELECT * FROM cart_item WHERE id = $1`;
+
         const sale = await dbPool.query(findSaleQuery, [sale_id, client_id]);
         if(sale.rowCount == 0 || !sale_id){
             return res.status(NOT_FOUND).json( {message: "Carrinho não foi encontrado"} );
         }
-        const cart_items = sale.rows[0].shopping_cart;
-        let shopping_cart = [];
-
-        for(item_id of cart_items){
-            const itemData = await dbPool.query(findItemsQuery, [item_id]);
-            shopping_cart.push( itemData.rows[0] );
-        }
+        const cart_items = await dbPool.query(`SELECT * FROM cart_item WHERE sale_id = $1`, [sale_id]);
+        let shopping_cart = cart_items.rows;
 
         let data = {
             'id': sale.rows[0].id,
