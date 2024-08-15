@@ -9,6 +9,37 @@ servers:
 - url: http://localhost:3001
 paths:
 
+  /finalizarVenda:
+    post:
+      summary: "Finaliza a venda"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                client_id:
+                  type: integer
+                sale_id:
+                  type: integer
+                metodo_pagamento:
+                  type: string
+      responses: 
+        '204':
+          description: se a venda for fechada com sucesso
+        '401':
+          description: Se a venda não pertencer ao usuário
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: erro interno do servidor
+
   /apagar:
     post:
       summary: >

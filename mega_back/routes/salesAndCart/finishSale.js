@@ -7,32 +7,38 @@ const dbPool = require('../../dbConnection');
 const { DEFAULT_MESSAGE } = require("../../myClasses");
 
 //http codes 
-const OK = 200;
-const CREATED = 201;
-const BAD_REQUEST = 400;
+const SUCCESS = 204;
 const UNAUTHORIZED = 401;
-const NOT_FOUND = 404;
-const UNPROCESSABLE_CONTENT = 422;
 const SERVER_ERR = 500;
 
-router.post('/caixa', async (req, res) => {
+// id
+// date_time
+// payment_method
+// sale_total
+// client
+// status
+
+const updateSale = `UPDATE sales SET status = $1, payment_method = $2 WHERE id = $3`;
+const getSaleClient = `SELECT client FROM sales WHERE id = $1`;
+
+//validar dados do cartão
+//validar pagamento por pix/qr_code
+
+router.post('/finalizarVenda', async (req, res) => {
     try{
         res.header('Content-Type', 'application/json');
         
-        const { sale_id, pagamento, total, cliente } = req.body;
+        const { sale_id, metodo_pagamento, client_id } = req.body;
 
-        const carrinho = await dbPool.query('SELECT EXISTS (SELECT 1 FROM sales WHERE id = $1', [sale_id]);
-
-        if (carrinho.rows[0].exist){
-            
-        }else{
-            
-        }
+        const saleClient = ( await dbPool.query(getSaleClient, [sale_id]) );
         
-        await dbPool.query(`INSERT INTO sales(date_time, payment_method, sale_total, client) VALUES($1, $2, $3, $4, $5) RETURNING id`,
-            [new Date(), pagamento, total, cliente]
-        );
-        res.status(OK).json({ 'message': 'Venda registrada com sucesso!' });
+        if(saleClient.rows[0].client == client_id){
+            await dbPool.query(updateSale, [true, metodo_pagamento, sale_id]);
+            return res.status(SUCCESS).send();
+        }else{
+            return res.status(UNAUTHORIZED).json( { message: "Venda não pertence a este usuário!" } );
+        }
+
     }catch{
         console.error('Erro na rota /finalizarVenda', err);
         res.status(SERVER_ERR).send('Erro ao registrar venda. Verifique o log.');

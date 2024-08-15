@@ -174,16 +174,18 @@
             <button type="submit">Visualizar</button>
         </form>
 
-        <form action="/caixa" method="post">
+        <form action="/finalizarVenda" method="post">
             <h2>Finalizar Venda</h2>
 
-            <input type="text" name="paymentMethod" placeholder="Método de Pagamento" required>
-            <input type="number" name="clientId" placeholder="ID do Cliente" required>
+            <input type="number" name="client_id" placeholder="ID do Cliente">
+            <input type="number" name="sale_id" placeholder="ID da venda">
+            <input type="text" name="metodo_pagamento" placeholder="Método de Pagamento">
             <button type="submit">Finalizar Venda</button>
         </form>
         
         <form action="/apagar" method="post">
             <h2>Deletar item ou venda toda</h2>
+
             <input type="number" name="client_id" placeholder="client_id">
             <input type="number" name="sale_id" placeholder="sale_id">
             <input type="number" name="item_id" placeholder="item_id">
