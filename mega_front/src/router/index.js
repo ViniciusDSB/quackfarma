@@ -3,6 +3,7 @@ import Index from "@/components/PagePrincipal/Index.vue";
 import ProductDescription from "@/components/produtos/ProductDescription.vue";
 import Recommendation from "@/components/produtos/Recommendation.vue";
 import CarrinhoProduct from "@/components/produtos/CarrinhoProduct.vue";
+import AddProduct from "@/components/admin/AddProduct.vue";
 
 const routes = [
     {
@@ -29,6 +30,11 @@ const routes = [
         path : '/shopping',
         name : 'Shopping',
         component: CarrinhoProduct
+    },
+    {
+        path : '/addProduct',
+        name : 'Add Product',
+        component: AddProduct
     }
 ]
 
