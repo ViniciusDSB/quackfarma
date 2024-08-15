@@ -84,6 +84,7 @@ export default {
         this.dialog = false
         this.email = null;
         this.password = null
+        window.location.reload();
       } catch (error) {
         this.$refs.alerta.error(error.response.data.message)
       } finally {

@@ -35,7 +35,7 @@ export default class User {
 
 
     get login() {
-        return localStorage.getItem('login')
+        return localStorage.getItem('login') ?? false
     }
 
     get address() {
@@ -80,6 +80,21 @@ export default class User {
 
     get id(){
         return localStorage.getItem('id')
+    }
+
+
+    logout(){
+        this._login = false
+        this._address =null
+        this._name = null
+        this._cpf = null
+        this._rg = null
+        this._phone_number = null
+        this._is_adm = null
+        this._sale_id= null
+        this._id= null
+        localStorage.clear()
+
     }
 
 }

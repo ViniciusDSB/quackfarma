@@ -27,6 +27,14 @@ export default {
     AlertMessage,
     cardProduto
   },
+  watch: {
+    '$route.query': {
+      handler() {
+        this.search(); // Executa a busca sempre que a query na URL mudar
+      },
+      immediate: true // Chama o handler imediatamente na primeira vez
+    }
+  },
   mounted() {
     this.search()
   },
@@ -39,7 +47,9 @@ export default {
   methods: {
     async search() {
       try {
-        const response = await searchProducts()
+        let query = this.$route.query
+        console.log(query)
+        const response = await searchProducts(query)
         this.products = response.data
         this.loading = false
       } catch (error) {
