@@ -14,7 +14,7 @@
                   <card-produto :product="product" :loading="loading"/>
                 </v-col>
                 <v-row>
-                  <v-btn icon="mdi-minus-circle-outline" class="align-self-center mx-16" size="x-large" elevation="18">
+                  <v-btn @click="excluirItem(product.id)" icon="mdi-minus-circle-outline" class="align-self-center mx-16" size="x-large" elevation="18">
                     <v-icon>
                       mdi-minus-circle-outline
                     </v-icon>
@@ -50,7 +50,7 @@
 <script>
 import LoadingCircle from "@/components/PagePrincipal/Loading.vue";
 import User from "@/model/User";
-import {seachUnit, searchShopping} from "@/services/productsService";
+import {deleteItemCarrinho, seachUnit, searchShopping} from "@/services/productsService";
 import AlertMessage from "@/components/alertas/AlertMessage.vue";
 import CardProduto from "@/components/produtos/CardProduto.vue";
 import Product from "@/model/Product";
@@ -71,11 +71,22 @@ export default {
       }
       return nome
     },
+    async excluirItem(id){
+      this.loading = true;
+      try {
+        await deleteItemCarrinho(Number.parseInt(this.user.sale_id),id)
+        await this.searchShopping()
+      }catch (error) {
+        this.$refs.alerta.error(error.response?.data.message ?? error.message)
+      } finally {
+        this.loading = false
+      }
+    },
     async searchShopping() {
       this.loading = true
       try {
         const response = await searchShopping(this.user.sale_id, this.user.id)
-        let products = response.data.data.shopping_cart
+        let products = response.data.shopping_cart
         for (const product of products) {
           const response = await seachUnit(product.medicine_code)
           this.products.push((new Product()).persistente(response.data[0]))
@@ -88,7 +99,7 @@ export default {
         this.shopping.push({
           Nome: 'Total',
           Quantidade: null,
-          Total: response.data.data.total
+          Total: response.data.total
         })
       } catch (error) {
         this.$refs.alerta.error(error.response?.data.message ?? error.message)

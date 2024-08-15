@@ -43,3 +43,10 @@ export const cadastrarMedicamento = async (form, user, imagem) => {
         needRecipe: form.receita,
     })
 }
+
+export const deleteItemCarrinho = async (saleId,itemId) => {
+    return http.post('/apagar',{
+        sale_id : saleId,
+        item_id : itemId
+    })
+}
