@@ -36,9 +36,6 @@ const updateSaleTotalQuery = `UPDATE sales SET sale_total = sale_total + $1 WHER
 const getMedData = `SELECT needs_recipe, on_stock, unit_price FROM medications WHERE code = $1`;
 
 async function updateSales(item_total, sale_id){
-    console.log("AAAAAAA");
-    console.log(item_total);
-    console.log(sale_id);
     item_total = parseFloat(item_total);
     await dbPool.query(updateSaleTotalQuery, [item_total, sale_id]);
 }
