@@ -147,6 +147,7 @@ async function setMedications(){
 }
 
 async function setCart_item(){
+
   await dbPool.query(`
     DO $$
     BEGIN
@@ -170,12 +171,20 @@ async function setCart_item(){
     BEGIN
       IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'cart_item' AND column_name = 'sale_id') THEN
         BEGIN
-          ALTER TABLE cart_item
-          ADD COLUMN sale_id INTEGER REFERENCES sales(id) ON DELETE CASCADE NOT NULL;
+          DROP TABLE cart_item;
+          CREATE TABLE cart_item(
+            id SERIAL PRIMARY KEY,
+            medicine_code INTEGER REFERENCES medications(code) ON DELETE CASCADE NOT NULL,
+            sold_amount INTEGER NOT NULL,
+            item_total NUMERIC(10, 2) NOT NULL,
+            recipe_path TEXT,
+            approval_status VARCHAR(16) NOT NULL,
+            sale_id INTEGER REFERENCES sales(id) ON DELETE CASCADE NOT NULL
+          );
         END;
       END IF;
     END $$;
-    `);
+  `);
 
   await dbPool.query(`
     CREATE TABLE IF NOT EXISTS cart_item(
