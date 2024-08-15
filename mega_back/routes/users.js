@@ -30,7 +30,12 @@ router.post('/fazerLogin', async (req, res) => {
                 const getUserSaleId = 'SELECT id FROM sales WHERE client = $1';
 
                 const clientData = await dbPool.query(clientDataQuery, [login.email]);
-                const sale_id = await dbPool.query(getUserSaleId, [clientData.rows[0].id]);
+                
+                let sale_id = ( await dbPool.query(getUserSaleId, [clientData.rows[0].id]) );
+                if(sale_id.rowCount == 0)
+                        sale_id = null;
+                else
+                    sale_id = sale_id.rows[0].id;
                 
                 if(sha256(`${login.password}`) == clientData.rows[0].password_hash){//se senha esta correta
                     res.status(ACCEPTED).json( {
@@ -41,7 +46,7 @@ router.post('/fazerLogin', async (req, res) => {
                             rg: clientData.rows[0].rg,
                             address: clientData.rows[0].address,
                             phone_number: clientData.rows[0].phone_number,
-                            sale_id: sale_id.rows[0].id,
+                            sale_id:  sale_id,
                             is_adm: false
                         }
                     );
