@@ -39,7 +39,7 @@ router.post('/finalizarVenda', async (req, res) => {
             return res.status(UNAUTHORIZED).json( { message: "Venda não pertence a este usuário!" } );
         }
 
-    }catch{
+    }catch(err){
         console.error('Erro na rota /finalizarVenda', err);
         res.status(SERVER_ERR).send('Erro ao registrar venda. Verifique o log.');
     }

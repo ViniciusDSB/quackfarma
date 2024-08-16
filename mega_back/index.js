@@ -11,6 +11,7 @@ setupDatabase();
 const basicRoutes = require("./routes/tests.js");
 const userRoutes = require("./routes/users.js");
 const medicineRoutes = require("./routes/medicines.js");
+const salesReport = require("./routes/salesReport.js");
 
 //sales operations (finish sale, add/remove from cart, see it)
 const addToCart = require("./routes/salesAndCart/addToCart.js");
@@ -21,6 +22,7 @@ const seeCart = require("./routes/salesAndCart/seeCart.js");
 app.use("/", basicRoutes);
 app.use("/", userRoutes);
 app.use("/", medicineRoutes);
+app.use("/", salesReport);
 
 app.use("/", addToCart);
 app.use("/", deleteSale);

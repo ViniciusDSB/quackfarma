@@ -43,7 +43,7 @@ paths:
   /apagar:
     post:
       summary: >
-        - se recer apena so sale_id então deleta a venda e todo o seu carrinho;  
+        - se receber apenas o sale_id então deleta a venda e todo o seu carrinho;  
         - se receber um sale_id e um item_id então deleta apenas este item
       requestBody:
         required: true
@@ -52,6 +52,8 @@ paths:
             schema:
               type: object
               properties:
+                client_id:
+                  type: integer
                 sale_id:
                   type: integer
                 item_id:

@@ -36,9 +36,6 @@ const updateSaleTotalQuery = `UPDATE sales SET sale_total = sale_total + $1 WHER
 const getMedData = `SELECT needs_recipe, on_stock, unit_price FROM medications WHERE code = $1`;
 
 async function updateSales(item_total, sale_id){
-    console.log("AAAAAAA");
-    console.log(item_total);
-    console.log(sale_id);
     item_total = parseFloat(item_total);
     await dbPool.query(updateSaleTotalQuery, [item_total, sale_id]);
 }
@@ -80,7 +77,7 @@ async function insertNewCart_item(sale_id, medCode, item_qtd, recipe_file){
 
     let med_data = (await dbPool.query( getMedData, [medCode] ));
     //se o medicamento não existe
-    if( !(med_data.rowCount > 0) ){
+    if( med_data.rowCount == 0 ){
         itemObj = { message: "Medicamento não encontrado" };
         return itemObj;
     }//se não tem o suficient eno estoque
@@ -123,11 +120,6 @@ async function insertNewCart_item(sale_id, medCode, item_qtd, recipe_file){
     itemObj = { id: cartItem_id, total: item_total }
     return itemObj;
 }
-
-//async function deleteSale(sale_id){
-//  uma rota que recebe um client id, um sale id
-//  e um parametro indiciando se deleta a venda inteira ou só os itens
-//}
 
 // Configure multer storage
 const storage = multer.diskStorage({
