@@ -5,9 +5,11 @@ const path = require('path');
 
 const dbPool = require('../../dbConnection');
 const { DEFAULT_MESSAGE } = require("../../myClasses");
+const { BADFAMILY } = require('dns');
 
 //http codes 
 const OK = 200;
+const BAD_REQUEST = 400;
 const UNAUTHORIZED = 401;
 const NOT_FOUND = 404;
 const SERVER_ERR = 500;
@@ -18,13 +20,16 @@ router.post('/verCarrinho', async (req, res) => {
     res.header('Content-Type', 'application/json');
     
     try{
-        const {sale_id, client_id} = req.body;
+        let  {sale_id, client_id} = req.body;
+
+        sale_id = parseInt(sale_id);
+        client_id = parseInt(client_id);
 
         if(!client_id){
-            return res.status(UNAUTHORIZED).json( {message: "Usuairo deve estar logado!"} );
+            return res.status(UNAUTHORIZED).json( {message: "Usuario não logado ou não informado!"} );
         }
-        if(!sale_id){
-            return res.status(UNAUTHORIZED).json( {message: "Id da venda deve ser informado"} );
+        if(!sale_id || sale_id == undefined){
+            return res.status(BAD_REQUEST).json( {message: "Id da venda deve ser informado"} );
         }
 
         const findSaleQuery = `SELECT * FROM sales WHERE id = $1 AND client = $2`;

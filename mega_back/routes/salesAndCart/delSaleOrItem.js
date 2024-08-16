@@ -20,30 +20,39 @@ const updateSaleTotalQuery = `UPDATE sales SET sale_total = sale_total - $1 WHER
 //deleta itme único, para isso reduz o total do item do total da venda
 //deleta o item
 //e em fim remove o itme da lista da venda
+
+//: ${item_id}, da venda; ${sale_id},  
 async function deleteItem(sale_id, item_id){
     
     try{
-        const itemTotal = ( await dbPool.query(getItemTotal, [item_id]) ).rows[0].item_total;
-        await dbPool.query(updateSaleTotalQuery, [itemTotal, sale_id]);
+        const itemTotal = ( await dbPool.query(getItemTotal, [item_id]) );
+        if(itemTotal.rowCount == 0)
+            return {error: `item não encontrado`, code: 1};
+
+        await dbPool.query(updateSaleTotalQuery, [itemTotal.rows[0].item_total, sale_id]);
         await dbPool.query(deleteItemQuery, [item_id]);
         return {}
 
     }catch(err){
         console.log("Erro em deleteItem(), da rota /apagar");
-        return {error: err}
+        return {error: err, code: 2}
     }
    
 }
 
 //itera sobre todos os itens, deletando um por um e então deleta a venda
+//: ${sale_id} 
 async function deleteSale(sale_id){
     try{
         const deleteSaleQuery = `DELETE FROM sales WHERE id = $1`;
-        await dbPool.query(deleteSaleQuery, [sale_id]);
+        const deletion = await dbPool.query(deleteSaleQuery, [sale_id]);
+        if(deletion.rowCount == 0)
+            return {error: `Venda não encontrada`, code: 1};
+        
         return {}
     }catch(err){
         console.log("Erro em deleteSale(), da rota /apagar");
-        return {error: err}
+        return {error: err, code: 2}
     }
 }
 
@@ -51,21 +60,39 @@ router.post("/apagar", async (req, res) => {
     res.header('Content-Type', 'application/json');
 
     try{
-        const { sale_id, item_id, client_id } = req.body;
+        let { sale_id, item_id, client_id } = req.body;
+        if(item_id == "undefined"){
+            item_id = undefined
+        }else{
+            item_id = parseInt(sale_id);
+        }
+        item_id = parseInt(item_id);
+        client_id = parseInt(client_id);
 
         //se tiver id de um item && id de uma venda então deleta o item especifico
         //se tiver somente id da venda então deleta tudo, venda e seus itens
-
+        if(client_id == undefined || client_id == ''){
+            return res.status(UNAUTHORIZED).json( {message: "Usuario não logado ou não informado!"} );
+        }
         const isFromClient = await dbPool.query(`SELECT 1 FROM sales WHERE id = $1 AND client = $2`, [sale_id, client_id])
         if(isFromClient.rowCount == 0){
-            return res.status(UNAUTHORIZED).json( { message: "Carrinho não pertence ao cliente" } );
+            return res.status(UNAUTHORIZED).json( { message: `Cliente não possui o carrinho` } );
         }
 
-        if( sale_id && item_id ){
+        if( sale_id != undefined && 
+            sale_id != false && 
+            item_id != undefined &&
+            item_id != false){
+                
             const itemDel = await deleteItem(sale_id, item_id);
+
             if(itemDel.error != undefined){
                 console.log(itemDel.error);
-                res.status(NOT_FOUND).json( {messae:"Algo deu errado ao deletar item!"} );
+                res.status(NOT_FOUND).json( 
+                    {messae: `Erro ao remover item! ${
+                        (itemDel.code == 1) ? itemDel.error :""
+                    }` } 
+                );
             }else
                 res.status(SUCCESS).send();
         }//deleta toda avenda e seus items
@@ -73,8 +100,12 @@ router.post("/apagar", async (req, res) => {
             const saleDel = await deleteSale(sale_id);
             
             if(saleDel.error){
-                console.log(saleDel.error)
-                res.status(BAD_REQUEST).json( {message: "Algo deu errado ao tentar deletar tudo!"} );
+                console.log(saleDel.error);
+                res.status(NOT_FOUND).json( 
+                    {messae: `Erro ao remover venda! ${
+                        (saleDel.code == 1) ? saleDel.error :""
+                    }` } 
+                );
             }else
                 res.status(SUCCESS).send();
         }else{
