@@ -79,12 +79,12 @@ export default {
       try {
         const response = await login(this.email, this.password);
         this.$refs.alerta.sucess('Login efetuado com sucesso')
-        let user = new User();
-        user.persistir(response.data)
+        this.user.persistir(response.data)
         this.dialog = false
         this.email = null;
         this.password = null
         window.location.reload();
+
       } catch (error) {
         this.$refs.alerta.error(error.response.data.message)
       } finally {
@@ -102,7 +102,8 @@ export default {
       email: null,
       password: null,
       loading: false,
-      visible: false
+      visible: false,
+      user: new User()
     }
   },
 }

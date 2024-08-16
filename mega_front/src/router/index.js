@@ -4,6 +4,8 @@ import ProductDescription from "@/components/produtos/ProductDescription.vue";
 import Recommendation from "@/components/produtos/Recommendation.vue";
 import CarrinhoProduct from "@/components/produtos/CarrinhoProduct.vue";
 import AddProduct from "@/components/admin/AddProduct.vue";
+import AdmHome from "@/components/admin/AdmHome.vue";
+import NewAdmin from "@/components/admin/NewAdmin.vue";
 
 const routes = [
     {
@@ -35,6 +37,16 @@ const routes = [
         path : '/addProduct',
         name : 'Add Product',
         component: AddProduct
+    },
+    {
+        path : '/HomeAdm',
+        name : 'Home Admin',
+        component: AdmHome
+    },
+    {
+        path : '/NewAdmin',
+        name : 'New Admin',
+        component: NewAdmin
     }
 ]
 

@@ -29,10 +29,10 @@
       </v-sheet>
       <v-btn class="rounded-xl mx-16 pl-10 background-color" size="x-large"
              @click="this.$router.push('/shopping')"
-             prepend-icon="mdi-cart-outline"/>
+             prepend-icon="mdi-cart-outline" v-if="!user.is_adm"/>
 
     </v-toolbar>
-    <v-tabs align-tabs="categorias" bg-color="#A4E9C8" fixed-tabs color="white">
+    <v-tabs align-tabs="categorias" bg-color="#A4E9C8" fixed-tabs color="white" v-if="!user.is_adm">
       <v-tab v-for="item in categorias" :text="item.text" :value="item.value" :key="item" @click="irPara(item.path)">
          {{ item.text }}
       </v-tab>

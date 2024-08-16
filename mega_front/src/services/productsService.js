@@ -2,9 +2,9 @@ import {http} from "@/services/apiResource";
 
 
 export const searchProducts = async (query) => {
-    if(query){
-        return http.get('/medicamento',{
-            params : query
+    if (query) {
+        return http.get('/medicamento', {
+            params: query
         })
     }
     return http.get('/medicamento')
@@ -44,9 +44,18 @@ export const cadastrarMedicamento = async (form, user, imagem) => {
     })
 }
 
-export const deleteItemCarrinho = async (saleId,itemId) => {
-    return http.post('/apagar',{
-        sale_id : saleId,
-        item_id : itemId
+export const deleteItemCarrinho = async (clienteId, saleId, itemId) => {
+    return http.post('/apagar', {
+        client_id: clienteId,
+        sale_id: saleId,
+        item_id: itemId
     })
+}
+
+export const finalizarCompra = async (clientId, saleId, metodoPagemnto) => {
+return http.post('/finalizarVenda',{
+    client_id : clientId,
+    sale_id : saleId,
+    metodo_pagamento: metodoPagemnto
+})
 }

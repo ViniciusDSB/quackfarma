@@ -18,6 +18,7 @@ import cardProduto from "@/components/produtos/CardProduto.vue";
 import {searchProducts} from "@/services/productsService";
 import AlertMessage from "@/components/alertas/AlertMessage.vue";
 import LoadingCircle from "@/components/PagePrincipal/Loading.vue";
+import User from "@/model/User";
 
 
 export default {
@@ -36,19 +37,27 @@ export default {
     }
   },
   mounted() {
-    this.search()
+    this.search();
+
   },
   data() {
     return {
       products: [],
-      loading: true
+      loading: false,
+      user : new User()
     }
   },
   methods: {
     async search() {
+      if(this.user.is_adm){
+        this.$router.push('/HomeAdm')
+        return
+      }
+      this.loading = true
+
       try {
+
         let query = this.$route.query
-        console.log(query)
         const response = await searchProducts(query)
         this.products = response.data
         this.loading = false
