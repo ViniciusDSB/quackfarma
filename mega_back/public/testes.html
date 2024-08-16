@@ -170,14 +170,14 @@
         <form action="/verCarrinho" method="post">
             <h2>Visualizar Carrinho</h2>
             <input type="number" name="sale_id" placeholder="id da venda">
-            <input type="number" name="client_id" placeholder="id do cliente">
+            <input type="number" name="client_id" placeholder="id do cliente" value="1">
             <button type="submit">Visualizar</button>
         </form>
 
         <form action="/finalizarVenda" method="post">
             <h2>Finalizar Venda</h2>
 
-            <input type="number" name="client_id" placeholder="ID do Cliente">
+            <input type="number" name="client_id" placeholder="ID do Cliente" value="1">
             <input type="number" name="sale_id" placeholder="ID da venda">
             <input type="text" name="metodo_pagamento" placeholder="Método de Pagamento">
             <button type="submit">Finalizar Venda</button>
@@ -186,11 +186,22 @@
         <form action="/apagar" method="post">
             <h2>Deletar item ou venda toda</h2>
 
-            <input type="number" name="client_id" placeholder="client_id">
+            <input type="number" name="client_id" placeholder="client_id" value="1">
             <input type="number" name="sale_id" placeholder="sale_id">
             <input type="number" name="item_id" placeholder="item_id">
             <button type="submit">Submeter</button>
-        </form>        
+        </form>
+
+        <form action="/gerarRelatorio" method="POST">
+            <h2>Gerar Relatorio</h2>
+            
+            <input type="number" name="admin_id" placeholder="manager_id" value=1>
+            <input type="date" name="start_date" placeholder="inicio">
+            <input type="date" name="end_date" placeholder="fim">
+
+            <button type="submit">gerar</button>
+
+        </form>
 
     </div>
 </body>
