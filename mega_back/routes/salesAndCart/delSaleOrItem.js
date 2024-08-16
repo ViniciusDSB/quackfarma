@@ -61,7 +61,11 @@ router.post("/apagar", async (req, res) => {
 
     try{
         let { sale_id, item_id, client_id } = req.body;
-        sale_id = parseInt(sale_id);
+        if(item_id == "undefined"){
+            item_id = undefined
+        }else{
+            item_id = parseInt(sale_id);
+        }
         item_id = parseInt(item_id);
         client_id = parseInt(client_id);
 

@@ -1,6 +1,7 @@
 const {app, express} = require('../expressApp');
 const router = express.Router();
 const path = require("path");
+const cors = require("cors");
 
 const fs = require("fs");
 const PDF = require("pdfkit");
@@ -21,7 +22,7 @@ const SERVER_ERR = 500;
 const getSalesQuery = `SELECT * FROM sales WHERE date_time >= $1 AND date_time <= $2`;
 const getShoppingCartQuery = `SELECT * FROM cart_item WHERE sale_id = $1`;
 const getAdmQuery = `SELECT name, email FROM managers WHERE id = $1`;
-
+const report_filePath = `../public/tmp/report.pdf`;
 //recbe duas datas
 //busca todas as veendas desse periodo
 //guarda em obj
@@ -50,7 +51,7 @@ async function fullRelatoryData(start_date, end_date){
 
         const allSalesData = ( await dbPool.query(getSalesQuery, [start_date, end_date]) ).rows;
         if(allSalesData.rowCount == 0)
-                return {error: "Nenhuma venda realizada no período solicitado."}
+                return {error: "Nenhuma venda realizada no período solicitado.", code: 1}
 
         for(sale of allSalesData){
             let saleData = {};
@@ -79,9 +80,8 @@ async function fullRelatoryData(start_date, end_date){
 
 function generateReportPdf(data, title, start_date, end_date, adminName, adminEmail) {
     const doc = new PDF();
-  
     // Save the PDF to a file
-    const filePath = path.join(__dirname, '../public/tmp/report.pdf');
+    const filePath = path.join(__dirname, report_filePath);
     doc.pipe(fs.createWriteStream(filePath));
   
     // Title
@@ -127,7 +127,6 @@ router.post("/gerarRelatorio", async (req, res) => {
 
     try{
         let { admin_id, start_date, end_date } = req.body;
-
         //busca o adm e veirfica se existe
         const adminData = await dbPool.query(getAdmQuery, [admin_id]);
         if(adminData.rowCount == 0)
@@ -158,8 +157,10 @@ router.post("/gerarRelatorio", async (req, res) => {
 
         generateReportPdf(data, "Relatorio de Vendas", start_date, end_date, name, email);
 
-        res.json( data );
+        res.setHeader('Content-Type', 'application/pdf');
+        let reportFile = path.join(__dirname, report_filePath);
 
+        res.status(OK).download(reportFile)
 
 
     }catch(err){

@@ -9,6 +9,55 @@ servers:
 - url: http://localhost:3001
 paths:
 
+  /gerarRelatorio:
+    post:
+      summary: "Gera o relatoro de venda de um periodo informado e retorna como pdf."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                start_date:
+                  type: date #2024-08-15 por exemplo, é como o input type=date envia
+                end_date:
+                  type: date
+                client_id:
+                  type: integer
+      responses: 
+        '200':
+          description: retorna o download do arquivo.
+        '400':
+          description: Se nenhum perido for informado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '401':
+          description: Se não for adm;
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Se nenhuma venda for encontrada no periodo;
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: erro interno do servidor
+
   /finalizarVenda:
     post:
       summary: "Finaliza a venda"
