@@ -143,7 +143,12 @@ router.post('/adicionarAoCarrinho', uploadRecipe.single('recipeFile'), async (re
     try{
         res.header('Content-Type', 'application/json');
         
-        const {sale_id, client_id, medCode, item_qtd } = req.body;
+        let {sale_id, client_id, medCode, item_qtd } = req.body;
+        sale_id = parseInt(sale_id);
+        client_id = parseInt(client_id);
+        medCode = parseInt(medCode);
+        item_qtd = parseInt(item_qtd);
+
         const pay_method = "não_confirmada";
         const recipe_file = req.file; //guarda os dados do upload
 

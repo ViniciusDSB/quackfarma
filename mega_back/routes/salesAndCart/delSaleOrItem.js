@@ -60,11 +60,16 @@ router.post("/apagar", async (req, res) => {
     res.header('Content-Type', 'application/json');
 
     try{
-        const { sale_id, item_id, client_id } = req.body;
+        let { sale_id, item_id, client_id } = req.body;
+        sale_id = parseInt(sale_id);
+        item_id = parseInt(item_id);
+        client_id = parseInt(client_id);
 
         //se tiver id de um item && id de uma venda então deleta o item especifico
         //se tiver somente id da venda então deleta tudo, venda e seus itens
-
+        if(client_id == undefined || client_id == ''){
+            return res.status(UNAUTHORIZED).json( {message: "Usuario não logado ou não informado!"} );
+        }
         const isFromClient = await dbPool.query(`SELECT 1 FROM sales WHERE id = $1 AND client = $2`, [sale_id, client_id])
         if(isFromClient.rowCount == 0){
             return res.status(UNAUTHORIZED).json( { message: `Cliente não possui o carrinho` } );

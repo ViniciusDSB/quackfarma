@@ -94,7 +94,7 @@ paths:
               type: object
               properties:
                 sale_id:
-                  type: integer #if not exists receives a sale-id and a client_id and returns an object with all the information abotu a sale  and its items s a null or undefined or an empty string
+                  type: integer #se não tiver um sale_id defininido então cria um novo, adiciona item ao carrinho e retorna o sale_id para uso posterior
                 client_id:
                   type: integer
                 medCode:
