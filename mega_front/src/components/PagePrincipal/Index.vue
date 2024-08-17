@@ -44,12 +44,13 @@ export default {
     return {
       products: [],
       loading: false,
-      user : new User()
+      user: new User()
     }
   },
   methods: {
     async search() {
-      if(this.user.is_adm){
+      if (this.user.is_adm == 'true' || this.user.is_adm == true) {
+        console.log(this.user.is_adm)
         this.$router.push('/HomeAdm')
         return
       }
@@ -60,9 +61,10 @@ export default {
         let query = this.$route.query
         const response = await searchProducts(query)
         this.products = response.data
-        this.loading = false
       } catch (error) {
-        this.$refs.alerta.error(error.message)
+        this.$refs.alerta.error(error.response?.data.message ?? error.message)
+      } finally {
+        this.loading = false
       }
     }
   }
@@ -74,7 +76,7 @@ export default {
 .card-container {
   display: flex;
   flex-wrap: wrap;
-   /* Espaçamento entre os cards */
+  /* Espaçamento entre os cards */
 }
 
 .card-item {

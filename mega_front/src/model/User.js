@@ -59,7 +59,9 @@ export default class User {
     }
 
     get is_adm() {
-        return localStorage.getItem('is_adm')
+        let isadim =  localStorage.getItem('is_adm')
+        return !(isadim == null || isadim == 'null' || isadim == 'false' || isadim == false);
+
     }
 
     get firstName(){

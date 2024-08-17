@@ -1,54 +1,57 @@
 <template>
   <loading-circle v-model="loading"/>
-  <v-card-title>
-    <div class="font-weight-medium text-h3 d-flex justify-center">Criar Conta Administrador</div>
-  </v-card-title>
-  <v-card-text>
-    <v-form ref="form" class="mx-10">
-      <div>
-        <v-text-field label="Nome" v-model="formData.name" :rules="nameRules" class="background-color my-5 rounded-lg"
-                      hide-details="auto" required/>
-        <v-text-field label="E-mail" type="email" placeholder="seu_email@email.com" v-model="formData.email"
-                      :rules="emailRules()" required class="background-color my-5 rounded-lg" hide-details="auto"/>
-      </div>
-    </v-form>
-    <v-form ref="senhaForm" class="mx-10">
-      <div>
-        <v-text-field
-            v-model="senha"
-            :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-            :type="visible ? 'text' : 'password'"
-            placeholder="Senha"
-            @click:append-inner="visible = !visible"
-            :rules="senhaRules"
-            maxlength="10"
-            class="background-color my-5 rounded-lg" hide-details="auto"
-        ></v-text-field>
-        <v-text-field
-            v-model="confirmarSenha"
-            :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-            :type="visible ? 'text' : 'password'"
-            placeholder="Confirme a senha"
-            @click:append-inner="visible = !visible"
-            :rules="senhaRules"
-            maxlength="10"
-            class="background-color my-5 rounded-lg" hide-details="auto"
-        ></v-text-field>
-        <v-alert color="error" text="Senha deve conter de 6 a 10 caracteres, contendo pelo menos
+  <v-card color="#70A89E">
+    <v-card-title>
+      <div class="font-weight-medium text-h3 d-flex justify-center">Criar Conta Administrador</div>
+    </v-card-title>
+    <v-card-text>
+      <v-form ref="form" class="mx-10">
+        <div>
+          <v-text-field label="Nome" v-model="formData.name" :rules="nameRules" class="background-color my-5 rounded-lg"
+                        hide-details="auto" required/>
+          <v-text-field label="E-mail" type="email" placeholder="seu_email@email.com" v-model="formData.email"
+                        :rules="emailRules()" required class="background-color my-5 rounded-lg" hide-details="auto"/>
+        </div>
+      </v-form>
+      <v-form ref="senhaForm" class="mx-10">
+        <div>
+          <v-text-field
+              v-model="senha"
+              :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
+              :type="visible ? 'text' : 'password'"
+              placeholder="Senha"
+              @click:append-inner="visible = !visible"
+              :rules="senhaRules"
+              maxlength="10"
+              class="background-color my-5 rounded-lg" hide-details="auto"
+          ></v-text-field>
+          <v-text-field
+              v-model="confirmarSenha"
+              :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
+              :type="visible ? 'text' : 'password'"
+              placeholder="Confirme a senha"
+              @click:append-inner="visible = !visible"
+              :rules="senhaRules"
+              maxlength="10"
+              class="background-color my-5 rounded-lg" hide-details="auto"
+          ></v-text-field>
+          <v-alert color="error" text="Senha deve conter de 6 a 10 caracteres, contendo pelo menos
             uma letra maiúscula, uma letra minuscula, um número e um caractere especial.">
-        </v-alert>
-      </div>
-    </v-form>
-  </v-card-text>
-  <v-card-actions>
+          </v-alert>
+        </div>
+      </v-form>
+    </v-card-text>
+    <v-card-actions>
 
-  </v-card-actions>
+    </v-card-actions>
+
   <v-sheet color="#70A89E"
-           class="d-flex align-end flex-column mr-16 ">
+           class="d-flex align-end flex-column mr-16 pa-2">
     <v-btn rounded="xl" size="x-large" class="background-color" @click="cadastrar">
       Cadastrar
     </v-btn>
   </v-sheet>
+  </v-card>
   <AlertMessage ref="alerta"/>
 </template>
 
@@ -63,8 +66,8 @@ import User from "@/model/User";
 export default {
   name: 'NewAdmin',
   components: {LoadingCircle, AlertMessage},
-  mounted(){
-    if(!this.user.is_adm){
+  mounted() {
+    if (!this.user.is_adm) {
       this.$router.push('/')
     }
   },
@@ -102,7 +105,7 @@ export default {
   ,
   data() {
     return {
-      user : new User(),
+      user: new User(),
       formData: {
         name: null,
         email: null

@@ -12,7 +12,7 @@
                           class="background-color w-50 my-5 rounded-lg"
                           :rules="rules" v-model="form.nome"/>
             <v-text-field hide-details="auto" placeholder="Código do Produto" type="number"
-                          class="background-color  my-5 rounded-lg w-50" :rules="rules" v-model="form.codigo"/>
+                          class="background-color  my-5 rounded-lg w-50" :rules="[ v => !!v || 'Campo é obrigatório']" v-model="form.codigo"/>
             <v-text-field placeholder="Valor do produto"
                           v-mask="['#,##','##,##','###,##','####,##','#####,##']"
                           class="background-color my-5 rounded-lg w-50"
@@ -52,7 +52,7 @@
                         hide-details="auto" clearable
                         maxlength="256"
                         no-resize
-                        clear-icon="mdi-close-circle" v-model="form.descricao"/>
+                        clear-icon="mdi-close-circle" v-model="form.instrucao"/>
             <v-textarea placeholder="Sintomas para quais o produto é recomendado"
                         class="background-color rounded-lg my-2 w-75 "
                         hide-details="auto" clearable
@@ -131,11 +131,6 @@ export default {
       const file = event.target.files[0];
       if (file) {
         this.imageUrl = URL.createObjectURL(file); // Criar URL da imagem
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          this.binario = e.target.result;
-        };
-        reader.readAsArrayBuffer(file);
       }
     },
     removeImage() {

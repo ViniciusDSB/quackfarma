@@ -8,3 +8,10 @@ export const createAdmin = async (data) => {
         "passwordRepeat": data.passwordRepeat,
     })
 }
+export const relatorio = async (inicio,fim,userId) => {
+    return await http.post('/gerarRelatorio', {
+        "start_date": inicio,
+        "end_date": fim,
+        "client_id":userId,
+    })
+}

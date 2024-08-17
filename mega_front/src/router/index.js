@@ -6,6 +6,7 @@ import CarrinhoProduct from "@/components/produtos/CarrinhoProduct.vue";
 import AddProduct from "@/components/admin/AddProduct.vue";
 import AdmHome from "@/components/admin/AdmHome.vue";
 import NewAdmin from "@/components/admin/NewAdmin.vue";
+import RelatorioVendas from "@/components/admin/RelatorioVendas.vue";
 
 const routes = [
     {
@@ -47,6 +48,11 @@ const routes = [
         path : '/NewAdmin',
         name : 'New Admin',
         component: NewAdmin
+    },
+    {
+        path : '/relatorio',
+        name : 'Venda',
+        component: RelatorioVendas
     }
 ]
 

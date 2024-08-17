@@ -36,9 +36,16 @@
 
 </template>
 <script>
+import User from "@/model/User";
 
 export default {
   name: 'RecommendationProducts',
+  mounted() {
+    if(this.user.is_adm){
+      this.$router.push('/')
+    }
+
+  },
   data() {
     return {
       selected: [],
@@ -68,8 +75,8 @@ export default {
           label: 'Já utiliza outros medicamentos? Quais?',
           value: 'medicamentos'
         },
-
-      ]
+      ],
+      user : new User()
     }
   }
 }
