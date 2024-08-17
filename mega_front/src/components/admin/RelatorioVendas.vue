@@ -34,6 +34,11 @@ export default {
     AlertMessage,
     VDateInput,
   },
+  mounted(){
+    if(!this.user.is_adm){
+      this.$router.push('/')
+    }
+  },
   data() {
     return {
       inicio: null,

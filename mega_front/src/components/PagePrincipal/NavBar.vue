@@ -79,10 +79,9 @@ export default {
     return {
       loading: false,
       categorias: [
-        {text: 'Medicamentos', value: 'medicamento', path: '/search?medCategory=Medicamento'},
-        {text: 'Higiene', value: 'higiene', path: '/search?medCategory=Higiene'},
-        {text: 'Suplemento', value: 'suplemento', path: '/search?medCategory=Suplemento'},
-        {text: 'Recomendações', value: 'recomendacoes', path: '/recommendation'},
+        {text: 'Medicamentos', value: 'medicamento', path: '/search?medCategory=MEDICAMENTO'},
+        {text: 'Higiene', value: 'higiene', path: '/search?medCategory=HIGIENE'},
+        {text: 'Suplemento', value: 'suplemento', path: '/search?medCategory=SUPLEMENTOS'},
       ],
       abrirLogin: false,
       nome: null,

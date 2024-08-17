@@ -74,4 +74,8 @@ export default class Product{
     get image_path() {
         return this._image_path;
     }
+
+    set id (id){
+        this._id = id;
+    }
 }

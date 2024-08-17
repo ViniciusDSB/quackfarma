@@ -48,6 +48,7 @@
                           prepend-icon="mdi-medical-bag"
                           variant="outlined"
                           counter
+                          accept="image/*"
                           multiple
                           v-model="file"
             />

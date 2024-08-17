@@ -87,9 +87,6 @@ export default {
       try{
         await finalizarCompra(this.user.id, Number.parseInt(this.user.sale_id),this.metodoPagamento)
         this.$refs.alerta.sucess('Compra realizada com sucesso')
-        if(this.shopping.length === 1){
-          this.user.sale_id = null
-        }
         this.shopping = null
         this.products = null
         this.user.sale_id = null
@@ -103,6 +100,9 @@ export default {
       this.loading = true;
       try {
         await deleteItemCarrinho(this.user.id, Number.parseInt(this.user.sale_id), id)
+        if(this.shopping.length === 1){
+          this.user.sale_id = null
+        }
         this.products = null
         this.shopping = null
         await this.searchShopping()
@@ -117,9 +117,14 @@ export default {
       try {
         const response = await searchShopping(this.user.sale_id, this.user.id)
         let products = response.data.shopping_cart
+        if (!products){
+          return
+        }
         for (const product of products) {
           const response = await seachUnit(product.medicine_code)
-          this.products.push((new Product()).persistente(response.data[0]))
+          let newProduto = (new Product()).persistente(response.data[0])
+          newProduto.id = product.id
+          this.products.push(newProduto)
           this.shopping.push({
             Nome: this.findName(product.medicine_code),
             Quantidade: product.sold_amount,
