@@ -6,7 +6,7 @@
     </v-card-title>
     <v-card-text>
       <v-form ref="form" class="pa-16">
-        <v-date-input v-model="inicio" hide-details="auto" label="Data de inicio" class="background-color my-5 rounded-lg "
+        <v-date-input  v-model="inicio" hide-details="auto" label="Data de inicio"  class="background-color my-5 rounded-lg "
                       :rules="[ v => !!v || 'Campo é obrigatório']"></v-date-input>
         <v-date-input v-model="fim" hide-details="auto" label="Data final" class="background-color my-5 rounded-lg"
                       :rules="[ v => !!v || 'Campo é obrigatório']"></v-date-input>

@@ -14,12 +14,11 @@ export const seachUnit = async (codigo) => {
     return http.get('/medicamento?medCode=' + codigo)
 }
 
-export const addShopping = async (sale, clientId, medCode, qtd) => {
-    return http.post('/adicionarAoCarrinho', {
-        'sale_id': sale,
-        'client_id': clientId,
-        'medCode': medCode,
-        'item_qtd': qtd
+export const addShopping = async (formData) => {
+    return http.post('/adicionarAoCarrinho', formData,{
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
     })
 }
 
@@ -30,17 +29,11 @@ export const searchShopping = async (saleId, clientId) => {
     })
 }
 
-export const cadastrarMedicamento = async (form, user, imagem) => {
-    return http.post('/cadastrarMedicamento', {
-        medName: form.nome,
-        medCode: form.codigo,
-        medCategory: form.categoria,
-        medDescription: form.descricao,
-        medUnitPrice: form.valor,
-        amountOnStock: form.qtd,
-        managerWhoAdded: user.id,
-        imageFile: imagem,
-        needRecipe: form.receita,
+export const cadastrarMedicamento = async (form) => {
+    return http.post('/cadastrarMedicamento',form,{
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
     })
 }
 

@@ -1,6 +1,6 @@
 <template>
   <loading-circle v-model="loading"/>
-  <div v-if="this.products.length > 0">
+  <div v-if="this.products && this.products.length > 0">
     <h1 class="ma-10 pr-10">
       Seu Carrinho
     </h1>
@@ -83,6 +83,13 @@ export default {
       this.loading = true;
       try{
         await finalizarCompra(this.user.id, Number.parseInt(this.user.sale_id),this.metodoPagamento)
+        this.$refs.alerta.sucess('Compra realizada com sucesso')
+        if(this.shopping.length === 1){
+          this.user.sale_id = null
+        }
+        this.shopping = null
+        this.products = null
+        this.user.sale_id = null
       }catch (error){
         this.$refs.alerta.error(error.response?.data.message ?? error.message)
       } finally {

@@ -63,6 +63,7 @@ export default {
         this.products = response.data
       } catch (error) {
         this.$refs.alerta.error(error.response?.data.message ?? error.message)
+        this.products = []
       } finally {
         this.loading = false
       }

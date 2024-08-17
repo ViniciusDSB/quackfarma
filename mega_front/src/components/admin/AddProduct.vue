@@ -14,7 +14,7 @@
             <v-text-field hide-details="auto" placeholder="Código do Produto" type="number"
                           class="background-color  my-5 rounded-lg w-50" :rules="[ v => !!v || 'Campo é obrigatório']" v-model="form.codigo"/>
             <v-text-field placeholder="Valor do produto"
-                          v-mask="['#,##','##,##','###,##','####,##','#####,##']"
+                          v-mask="['#.##','##.##','###.##','####.##','#####.##']"
                           class="background-color my-5 rounded-lg w-50"
                           hide-details="auto" :rules="rules" v-model="form.valor"/>
             <v-text-field
@@ -147,9 +147,23 @@ export default {
         return
       }
       try {
-
-        await cadastrarMedicamento(this.form, this.user,this.binario)
+        const formData = new FormData();
+        formData.append('medName', this.form.nome.toUpperCase());
+        formData.append('medCode', this.form.codigo);
+        formData.append('medDescription', this.form.descricao);
+        formData.append('medCategory', this.form.categoria);
+        formData.append('medUnitPrice', Number.parseFloat(this.form.valor));
+        formData.append('amountOnStock', this.form.qtd);
+        formData.append('managerWhoAdded', this.user.id);
+        formData.append('imageFile', this.img[0]);
+        if (this.form.receita === 'NÃO'){
+          formData.append('needRecipe','false');
+        }else {
+          formData.append('needRecipe','true');
+        }
+        await cadastrarMedicamento(formData)
         this.$refs.alerta.sucess('Produto cadastrado com sucesso')
+        window.location.reload();
 
       } catch (error) {
         this.$refs.alerta.error(error.response?.data.message ?? error.message)
