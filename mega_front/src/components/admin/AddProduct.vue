@@ -12,7 +12,8 @@
                           class="background-color w-50 my-5 rounded-lg"
                           :rules="rules" v-model="form.nome"/>
             <v-text-field hide-details="auto" placeholder="Código do Produto" type="number"
-                          class="background-color  my-5 rounded-lg w-50" :rules="[ v => !!v || 'Campo é obrigatório']" v-model="form.codigo"/>
+                          class="background-color  my-5 rounded-lg w-50" :rules="[ v => !!v || 'Campo é obrigatório']"
+                          v-model="form.codigo"/>
             <v-text-field placeholder="Valor do produto"
                           v-mask="['#.##','##.##','###.##','####.##','#####.##']"
                           class="background-color my-5 rounded-lg w-50"
@@ -117,8 +118,8 @@ import {cadastrarMedicamento} from "@/services/productsService";
 
 export default {
   name: 'AddProduct',
-  mounted(){
-    if(!this.user.is_adm){
+  mounted() {
+    if (!this.user.is_adm) {
       this.$router.push('/')
     }
   },
@@ -150,16 +151,16 @@ export default {
         const formData = new FormData();
         formData.append('medName', this.form.nome.toUpperCase());
         formData.append('medCode', this.form.codigo);
-        formData.append('medDescription', this.form.descricao);
+        formData.append('medDescription', this.form.descricao + " " + this.form.sintomas + " " + this.form.instrucao);
         formData.append('medCategory', this.form.categoria);
         formData.append('medUnitPrice', Number.parseFloat(this.form.valor));
         formData.append('amountOnStock', this.form.qtd);
         formData.append('managerWhoAdded', this.user.id);
         formData.append('imageFile', this.img[0]);
-        if (this.form.receita === 'NÃO'){
-          formData.append('needRecipe','false');
-        }else {
-          formData.append('needRecipe','true');
+        if (this.form.receita === 'NÃO') {
+          formData.append('needRecipe', 'false');
+        } else {
+          formData.append('needRecipe', 'true');
         }
         await cadastrarMedicamento(formData)
         this.$refs.alerta.sucess('Produto cadastrado com sucesso')
@@ -176,7 +177,7 @@ export default {
     return {
       img: null,
       imageUrl: null,
-      binario : null,
+      binario: null,
       resposta: ['SIM', 'NÃO'],
       rules: [
         v => !!v || 'Campo é obrigatório',

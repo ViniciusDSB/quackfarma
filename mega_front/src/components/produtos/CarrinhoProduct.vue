@@ -67,6 +67,9 @@ export default {
   name: 'CarrinhoProduct',
   components: {CardProduto, AlertMessage, LoadingCircle},
   mounted() {
+    if(this.user.is_adm){
+      this.$router.push('/')
+    }
     this.searchShopping();
   },
   methods: {
