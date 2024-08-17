@@ -32,7 +32,12 @@ router.post("/cadastrarMedicamento", uploadMedImages.single('imageFile'), async 
         
         const imageUrl = `http://localhost:3001/uploads/medicines_images/${medImage.filename}`;
         
-        const needsRecipe = req.body.needsRecipe? true : false;
+        let needs_recipe = req.body.needRecipe
+        if(needs_recipe == '' || needs_recipe == undefined || needs_recipe == null){
+            needs_recipe = false
+        }else{
+            needs_recipe = true;
+        }
         const medicine = new Medicine(
             req.body.medName,
             req.body.medCode,
@@ -42,10 +47,11 @@ router.post("/cadastrarMedicamento", uploadMedImages.single('imageFile'), async 
             req.body.amountOnStock,
             req.body.managerWhoAdded,
             imageUrl,
-            needsRecipe
+            needs_recipe
         );
         medicine.validadeData();
-    
+        
+        
         if(medicine.status === DEFAULT_MESSAGE){
             await dbPool.query(`INSERT INTO medications (
                 name,
@@ -64,12 +70,13 @@ router.post("/cadastrarMedicamento", uploadMedImages.single('imageFile'), async 
                     medicine.code,
                     medicine.category,
                     medicine.description,
-                    medicine.needsRecipe,
-                    medicine.unitPrice,
-                    medicine.amountOnStock,
-                    medicine.managerWhoAdded,
-                    medicine.imagePath,
-                    new Date(), new Date()
+                    medicine.needs_recipe,
+                    medicine.unit_price,
+                    medicine.on_stock,
+                    medicine.manager,
+                    medicine.image_path,
+                    new Date(),
+                    new Date()
                 ]);
                 
             res.status(SUCCESS).send();
@@ -139,7 +146,7 @@ class MedicineFinder{
                 created_at, 
                 last_update 
             } = req.query;
-            const needsRecipe = (req.query.needsRecipe == 'on' || req.query.needsRecipe == true ) ? true : 
+            const needs_recipe = (req.query.needsRecipe == 'on' || req.query.needsRecipe == true ) ? true : 
             ( req.query.needsRecipe == undefined) ? undefined : false;
             
             let searchQuery = ``;
@@ -151,7 +158,7 @@ class MedicineFinder{
                 searchQuery = `SELECT * FROM medications WHERE 1=1`;
             }
             
-            const medData = new Medicine( medName, medCode, medCategory, medDescription, medUnitPrice, amountOnStock, managerWhoAdded, imagePath, needsRecipe, created_at, last_update );
+            const medData = new Medicine( medName, medCode, medCategory, medDescription, medUnitPrice, amountOnStock, managerWhoAdded, imagePath, needs_recipe, created_at, last_update );
             
             let  queryValues = [];
 

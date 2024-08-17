@@ -133,15 +133,19 @@ router.post("/gerarRelatorio", async (req, res) => {
             return res.status(UNAUTHORIZED).json({ message: "Usuáiro não autorizado!" });
 
         const { name, email } = adminData.rows[0];
-
+        
         //verifica se recebeu data de inicio
         if(!start_date)
             return res.status(BAD_REQUEST).json({ message: "Perido não informado! Informe no mínimo perido de ínicio." });
-        if(!end_date)
-                end_date = start_date;
-
         start_date = new Date(start_date);
-        end_date = new Date(end_date);
+        
+        if( !end_date){
+            end_date = new Date(start_date);
+            end_date.setDate(end_date.getDate() + 1);
+        }else{
+            end_date = new Date(end_date);
+            end_date.setDate(end_date.getDate() + 1);
+        }
         end_date.setDate(end_date.getDate() + 1);
 
         const data = await fullRelatoryData(start_date, end_date);

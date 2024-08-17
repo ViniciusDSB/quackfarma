@@ -1,7 +1,7 @@
 const DEFAULT_MESSAGE = "OK";
 
 class Medicine{
-    constructor(medName, medCode, medCategory, medDescription, medUnitPrice, amountOnStock, managerWhoAdded, imagePath, needsRecipe, created_at, last_update){
+    constructor(medName, medCode, medCategory, medDescription, medUnitPrice, amountOnStock, managerWhoAdded, imagePath, needs_recipe, created_at, last_update){
 
         if(medName == '' || medName == undefined){ this.medName = null }
         else{this.name = medName}
@@ -27,8 +27,8 @@ class Medicine{
         if(imagePath == '' || imagePath == undefined){ this.imagePath = null }
         else{this.image_path = imagePath}
 
-        if(needsRecipe === '' || needsRecipe == undefined){ this.needsRecipe = null}
-        else{this.needs_recipe = needsRecipe}
+        if(needs_recipe === '' || needs_recipe == undefined){ this.needs_recipe = false}
+        else{this.needs_recipe = needs_recipe}
 
         if(created_at == null || created_at == '' || created_at == undefined){this.created_at = null}
         else{this.created_at = created_at}

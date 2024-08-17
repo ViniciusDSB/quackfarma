@@ -45,7 +45,13 @@ async function deleteItem(sale_id, item_id){
 async function deleteSale(sale_id){
     try{
         const deleteSaleQuery = `DELETE FROM sales WHERE id = $1`;
+        const deleteAllItems = `DELETE FROM cart_item WHERE sale_id = $1`;
+
+        const itemsDeletion = await dbPool.query(deleteAllItems, [sale_id]);
         const deletion = await dbPool.query(deleteSaleQuery, [sale_id]);
+
+        if(itemsDeletion.rowCount == 0)
+            return {error: `Itens da venda não encontrados`, code: 1};
         if(deletion.rowCount == 0)
             return {error: `Venda não encontrada`, code: 1};
         
@@ -61,14 +67,7 @@ router.post("/apagar", async (req, res) => {
 
     try{
         let { sale_id, item_id, client_id } = req.body;
-        if(item_id == "undefined"){
-            item_id = undefined
-        }else{
-            item_id = parseInt(sale_id);
-        }
-        item_id = parseInt(item_id);
-        client_id = parseInt(client_id);
-
+        
         //se tiver id de um item && id de uma venda então deleta o item especifico
         //se tiver somente id da venda então deleta tudo, venda e seus itens
         if(client_id == undefined || client_id == ''){
@@ -79,19 +78,15 @@ router.post("/apagar", async (req, res) => {
             return res.status(UNAUTHORIZED).json( { message: `Cliente não possui o carrinho` } );
         }
 
-        if( sale_id != undefined && 
-            sale_id != false && 
-            item_id != undefined &&
-            item_id != false){
-                
+        if( item_id && sale_id ){
             const itemDel = await deleteItem(sale_id, item_id);
 
             if(itemDel.error != undefined){
                 console.log(itemDel.error);
                 res.status(NOT_FOUND).json( 
-                    {messae: `Erro ao remover item! ${
+                    {message: `Erro ao remover item! ${
                         (itemDel.code == 1) ? itemDel.error :""
-                    }` } 
+                    }`} 
                 );
             }else
                 res.status(SUCCESS).send();
@@ -102,7 +97,7 @@ router.post("/apagar", async (req, res) => {
             if(saleDel.error){
                 console.log(saleDel.error);
                 res.status(NOT_FOUND).json( 
-                    {messae: `Erro ao remover venda! ${
+                    {message: `Erro ao remover venda! ${
                         (saleDel.code == 1) ? saleDel.error :""
                     }` } 
                 );

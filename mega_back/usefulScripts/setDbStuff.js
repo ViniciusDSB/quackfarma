@@ -40,7 +40,7 @@ async function setMedications(){
     
   await dbPool.query('DROP TABLE IF EXISTS medicines CASCADE');
   await dbPool.query(`DROP TABLE IF EXISTS medications CASCADE`);
-   dbPool.query(`CREATE TABLE IF NOT EXISTS medications(
+  await dbPool.query(`CREATE TABLE IF NOT EXISTS medications(
       id SERIAL PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
       code INTEGER NOT NULL UNIQUE,
