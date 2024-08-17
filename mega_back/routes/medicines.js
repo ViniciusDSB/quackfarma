@@ -4,7 +4,6 @@ const multer = require('multer');
 
 const dbPool = require('../dbConnection');
 const {Medicine, DEFAULT_MESSAGE} = require("../myClasses");
-const { search } = require('./users');
 
 //http codes 
 const OK = 200;
@@ -146,17 +145,22 @@ class MedicineFinder{
                 created_at, 
                 last_update 
             } = req.query;
-            const needs_recipe = (req.query.needsRecipe == 'on' || req.query.needsRecipe == true ) ? true : 
-            ( req.query.needsRecipe == undefined) ? undefined : false;
+            let needs_recipe = req.query.needsRecipe;
             
             let searchQuery = ``;
             if(req.query.fields){
                 const fields = req.query.fields;
-
                 searchQuery= `SELECT ${fields} FROM medications WHERE 1=1`;
             }else{
                 searchQuery = `SELECT * FROM medications WHERE 1=1`;
             }
+            
+            if(needs_recipe == undefined)
+                needs_recipe = null
+            else if(needs_recipe == 'false')
+                needs_recipe = false
+            else if(needs_recipe == 'true')
+                needs_recipe = true
             
             const medData = new Medicine( medName, medCode, medCategory, medDescription, medUnitPrice, amountOnStock, managerWhoAdded, imagePath, needs_recipe, created_at, last_update );
             
@@ -168,6 +172,8 @@ class MedicineFinder{
                     paramCount+=1;
                     searchQuery += ` AND ${key} = $${paramCount}`;
                     queryValues.push(medData[key]);
+                    console.log(searchQuery);
+                    console.log(queryValues)
                 }
             })
 

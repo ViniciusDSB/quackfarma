@@ -27,7 +27,7 @@ class Medicine{
         if(imagePath == '' || imagePath == undefined){ this.imagePath = null }
         else{this.image_path = imagePath}
 
-        if(needs_recipe === '' || needs_recipe == undefined){ this.needs_recipe = false}
+        if(needs_recipe === '' || needs_recipe === undefined){ this.needs_recipe = false}
         else{this.needs_recipe = needs_recipe}
 
         if(created_at == null || created_at == '' || created_at == undefined){this.created_at = null}
